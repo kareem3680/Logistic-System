@@ -18,7 +18,7 @@ export const verifyToken = async (token) => {
     decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
     if (err.name === "TokenExpiredError") {
-      await logger.warn("Token expired", { expiredAt: err.expiredAt });
+      await logger.info("Token expired", { expiredAt: err.expiredAt });
       throw new ApiError("⏰ Token expired. Please login again.", 401);
     }
     await logger.error("Invalid token", { error: err.message });
