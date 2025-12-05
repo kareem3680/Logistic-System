@@ -8,7 +8,7 @@ export const getAllLoads = asyncHandler(async (req, res) => {
   const result = await getAllLoadsService(req);
 
   res.status(200).json({
-    message: "📦 Loads retrieved successfully",
+    message: "Loads retrieved successfully",
     results: result.results,
     period: result.period,
     data: result.data,
@@ -19,7 +19,7 @@ export const getAllLoads = asyncHandler(async (req, res) => {
 export const addDriverDocuments = asyncHandler(async (req, res) => {
   const result = await addDriverDocumentsService(req);
   res.status(200).json({
-    message: "✅ Driver documents uploaded successfully",
+    message: "Driver documents uploaded successfully",
     data: result,
   });
 });

@@ -1,4 +1,5 @@
 import asyncHandler from "express-async-handler";
+import { subDays } from "date-fns";
 
 import loadModel from "../models/loadModel.js";
 import driverModel from "../../driver/models/driverModel.js";
@@ -9,6 +10,7 @@ import { sanitizeLoad } from "../../../utils/sanitizeData.js";
 import Logger from "../../../utils/loggerService.js";
 const logger = new Logger("summary");
 
+// ====== Helper Functions ======
 const getWeekPeriod = (date = new Date()) => {
   const day = date.getDay();
   let lastFriday = new Date(date);
@@ -27,6 +29,74 @@ const getWeekPeriod = (date = new Date()) => {
   const formatDate = (d) => d.toISOString().split("T")[0];
 
   return { from: formatDate(lastFriday), to: formatDate(nextThursday) };
+};
+
+const calculateTruckFinancials = (
+  loads,
+  truck,
+  repairPerMile,
+  insurancePerMile
+) => {
+  const totalLoads = loads.length;
+  const totalMiles = loads.reduce((sum, l) => sum + (l.distanceMiles || 0), 0);
+  const totalRevenue = loads.reduce((sum, l) => sum + (l.totalPrice || 0), 0);
+
+  const fuelCost = totalMiles * (truck.fuelPerMile || 0);
+  const repairCost = totalMiles * repairPerMile;
+  const insuranceCost = totalMiles * insurancePerMile;
+
+  const totalDriverPay = loads.reduce((sum, l) => {
+    const rate = l.driverId?.pricePerMile || 0;
+    return sum + rate * (l.distanceMiles || 0);
+  }, 0);
+
+  const totalExpenses = fuelCost + repairCost + insuranceCost + totalDriverPay;
+  const netProfit = totalRevenue - totalExpenses;
+
+  const avgRevenuePerMile = totalMiles ? totalRevenue / totalMiles : 0;
+  const avgExpensePerMile = totalMiles ? totalExpenses / totalMiles : 0;
+  const avgProfitPerMile = avgRevenuePerMile - avgExpensePerMile;
+  const profitMargin = totalRevenue ? (netProfit / totalRevenue) * 100 : 0;
+
+  return {
+    totalLoads,
+    totalMiles,
+    totalRevenue,
+    fuelCost,
+    repairCost,
+    insuranceCost,
+    totalDriverPay,
+    totalExpenses,
+    netProfit,
+    avgRevenuePerMile,
+    avgExpensePerMile,
+    avgProfitPerMile,
+    profitMargin,
+  };
+};
+
+const formatFinancialSummary = (financials) => {
+  return {
+    totalLoads: financials.totalLoads,
+    totalMiles: financials.totalMiles,
+    totalRevenue: Number(financials.totalRevenue.toFixed(2)),
+    fuelCost: Number(financials.fuelCost.toFixed(2)),
+    repairCost: Number(financials.repairCost.toFixed(2)),
+    insuranceCost: Number(financials.insuranceCost.toFixed(2)),
+    driverPay: Number(financials.totalDriverPay.toFixed(2)),
+    totalExpenses: Number(financials.totalExpenses.toFixed(2)),
+    netProfit: Number(financials.netProfit.toFixed(2)),
+    avgRevenuePerMile: Number(financials.avgRevenuePerMile.toFixed(2)),
+    avgExpensePerMile: Number(financials.avgExpensePerMile.toFixed(2)),
+    avgProfitPerMile: Number(financials.avgProfitPerMile.toFixed(2)),
+    profitMargin: Math.round(financials.profitMargin),
+    currency: "USD",
+  };
+};
+
+const calculatePercentageChange = (currentValue, prevValue) => {
+  if (!prevValue) return 0;
+  return Math.round(((currentValue - prevValue) / prevValue) * 100);
 };
 
 // ====== Driver Summary ======
@@ -84,7 +154,10 @@ export const getTruckSummaryService = asyncHandler(async (req) => {
 
   const truck = await truckModel
     .findById(id)
-    .populate("assignedDriver", "driverId name phone pricePerMile");
+    .populate(
+      "assignedDriver",
+      "driverId name phone pricePerMile capacity year"
+    );
   if (!truck) throw new ApiError("🛑 Truck not found in database", 404);
 
   const settings = await settingModel.find({
@@ -113,59 +186,65 @@ export const getTruckSummaryService = asyncHandler(async (req) => {
     .populate("driverId", "driverId name phone pricePerMile currency")
     .populate("truckId", "truckId model plateNumber");
 
-  const totalLoads = loads.length;
-  const totalMiles = loads.reduce((sum, l) => sum + (l.distanceMiles || 0), 0);
-  const totalRevenue = loads.reduce((sum, l) => sum + (l.totalPrice || 0), 0);
+  const financials = calculateTruckFinancials(
+    loads,
+    truck,
+    repairPerMile,
+    insurancePerMile
+  );
+  const summary = formatFinancialSummary(financials);
 
-  const fuelCost = totalMiles * (truck.fuelPerMile || 0);
-  const repairCost = totalMiles * repairPerMile;
-  const insuranceCost = totalMiles * insurancePerMile;
+  const periodLength = endDate.getTime() - startDate.getTime();
 
-  const totalDriverPay = loads.reduce((sum, l) => {
-    const rate = l.driverId?.pricePerMile || 0;
-    return sum + rate * (l.distanceMiles || 0);
-  }, 0);
+  const previousNetProfits = [];
 
-  const totalExpenses = fuelCost + repairCost + insuranceCost + totalDriverPay;
-  const netProfit = totalRevenue - totalExpenses;
+  for (let i = 1; i <= 7; i++) {
+    const prevStart = new Date(startDate.getTime() - periodLength * i);
+    const prevEnd = new Date(endDate.getTime() - periodLength * i);
 
-  const avgRevenuePerMile = totalMiles
-    ? Number((totalRevenue / totalMiles).toFixed(2))
-    : 0;
-  const avgExpensePerMile = totalMiles
-    ? Number((totalExpenses / totalMiles).toFixed(2))
-    : 0;
+    const prevLoads = await loadModel
+      .find({
+        truckId: id,
+        status: "delivered",
+        createdAt: { $gte: prevStart, $lte: prevEnd },
+      })
+      .populate("driverId", "driverId name phone pricePerMile currency")
+      .populate("truckId", "truckId model plateNumber");
 
-  const detailedLoads = loads.map((l) => sanitizeLoad(l));
+    const prevFinancials = calculateTruckFinancials(
+      prevLoads,
+      truck,
+      repairPerMile,
+      insurancePerMile
+    );
 
-  await logger.info(`Truck Summary | Truck: ${id} | Loads: ${totalLoads}`);
+    previousNetProfits.push(Number(prevFinancials.netProfit.toFixed(2)));
+  }
+
+  const netProfitHistory = {
+    current: summary.netProfit,
+    previous: previousNetProfits,
+  };
+
+  await logger.info(
+    `Truck Summary | Truck: ${id} | Loads: ${financials.totalLoads}`
+  );
 
   return {
+    period: { from, to },
     truckId: truck.truckId,
     truckInfo: {
       model: truck.model,
       plateNumber: truck.plateNumber,
       source: truck.source,
       type: truck.type,
+      year: truck.year,
+      capacity: truck.capacity,
       assignedDriver: truck.assignedDriver,
       fuelPerMile: truck.fuelPerMile,
     },
-    summary: {
-      totalLoads,
-      totalMiles,
-      totalRevenue,
-      fuelCost: Number(fuelCost.toFixed(2)),
-      repairCost: Number(repairCost.toFixed(2)),
-      insuranceCost: Number(insuranceCost.toFixed(2)),
-      driverPay: Number(totalDriverPay.toFixed(2)),
-      totalExpenses: Number(totalExpenses.toFixed(2)),
-      netProfit: Number(netProfit.toFixed(2)),
-      avgRevenuePerMile,
-      avgExpensePerMile,
-      currency: "USD",
-    },
-    period: { from, to },
-    loads: detailedLoads,
+    summary,
+    netProfitHistory,
   };
 });
 
@@ -182,22 +261,59 @@ export const getAllTrucksSummaryService = asyncHandler(async (req) => {
   const startDate = new Date(from);
   const endDate = new Date(to);
 
-  const trucks = await truckModel.find(
-    {},
-    "truckId plateNumber fuelPerMile source"
-  );
-  if (!trucks.length) throw new ApiError("🛑 No trucks found in database", 404);
+  const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+  const prevStartDate = subDays(startDate, daysDiff);
+  const prevEndDate = subDays(endDate, daysDiff);
 
-  const truckCompany = trucks.filter((t) => t.source === "company").length;
-  const truckOther = trucks.filter((t) => t.source === "other").length;
+  const [trucks, settings, currentLoads, previousLoads] = await Promise.all([
+    truckModel.find({}, "truckId plateNumber fuelPerMile source"),
+    settingModel.find({
+      key: { $in: ["repairPerMile", "insurancePerMile"] },
+    }),
+    loadModel
+      .find({
+        status: "delivered",
+        createdAt: { $gte: startDate, $lte: endDate },
+      })
+      .populate("driverId", "pricePerMile"),
+    loadModel
+      .find({
+        status: "delivered",
+        createdAt: { $gte: prevStartDate, $lte: prevEndDate },
+      })
+      .populate("driverId", "pricePerMile"),
+  ]);
 
-  const settings = await settingModel.find({
-    key: { $in: ["repairPerMile", "insurancePerMile"] },
-  });
+  if (!trucks.length) {
+    throw new ApiError("🛑 No trucks found in database", 404);
+  }
+
   const repairPerMile =
     settings.find((s) => s.key === "repairPerMile")?.value || 0;
   const insurancePerMile =
     settings.find((s) => s.key === "insurancePerMile")?.value || 0;
+
+  const currentLoadsByTruck = {};
+  const previousLoadsByTruck = {};
+
+  currentLoads.forEach((load) => {
+    const truckId = load.truckId?.toString();
+    if (truckId) {
+      if (!currentLoadsByTruck[truckId]) currentLoadsByTruck[truckId] = [];
+      currentLoadsByTruck[truckId].push(load);
+    }
+  });
+
+  previousLoads.forEach((load) => {
+    const truckId = load.truckId?.toString();
+    if (truckId) {
+      if (!previousLoadsByTruck[truckId]) previousLoadsByTruck[truckId] = [];
+      previousLoadsByTruck[truckId].push(load);
+    }
+  });
+
+  const truckCompany = trucks.filter((t) => t.source === "company").length;
+  const truckOther = trucks.filter((t) => t.source === "other").length;
 
   let totalLoads = 0,
     totalMiles = 0,
@@ -207,80 +323,113 @@ export const getAllTrucksSummaryService = asyncHandler(async (req) => {
     totalInsuranceCost = 0,
     totalDriverPay = 0;
 
+  let prevTotalMiles = 0,
+    prevTotalRevenue = 0,
+    prevTotalFuelCost = 0,
+    prevTotalRepairCost = 0,
+    prevTotalInsuranceCost = 0,
+    prevTotalDriverPay = 0;
+
   const trucksSummary = [];
 
   for (const truck of trucks) {
-    const loads = await loadModel
-      .find({
-        truckId: truck._id,
-        status: "delivered",
-        createdAt: { $gte: startDate, $lte: endDate },
-      })
-      .populate("driverId", "pricePerMile");
+    const truckId = truck._id.toString();
+    const truckLoads = currentLoadsByTruck[truckId] || [];
+    const truckPrevLoads = previousLoadsByTruck[truckId] || [];
 
-    const truckLoads = loads.length;
-    const miles = loads.reduce((sum, l) => sum + (l.distanceMiles || 0), 0);
-    const revenue = loads.reduce((sum, l) => sum + (l.totalPrice || 0), 0);
+    const currentFinancials = calculateTruckFinancials(
+      truckLoads,
+      truck,
+      repairPerMile,
+      insurancePerMile
+    );
+    const previousFinancials = calculateTruckFinancials(
+      truckPrevLoads,
+      truck,
+      repairPerMile,
+      insurancePerMile
+    );
 
-    const fuelCost = miles * (truck.fuelPerMile || 0);
-    const repairCost = miles * repairPerMile;
-    const insuranceCost = miles * insurancePerMile;
+    totalLoads += currentFinancials.totalLoads;
+    totalMiles += currentFinancials.totalMiles;
+    totalRevenue += currentFinancials.totalRevenue;
+    totalFuelCost += currentFinancials.fuelCost;
+    totalRepairCost += currentFinancials.repairCost;
+    totalInsuranceCost += currentFinancials.insuranceCost;
+    totalDriverPay += currentFinancials.totalDriverPay;
 
-    const driverPay = loads.reduce((sum, l) => {
-      const rate = l.driverId?.pricePerMile || 0;
-      return sum + rate * (l.distanceMiles || 0);
-    }, 0);
-
-    const expenses = fuelCost + repairCost + insuranceCost + driverPay;
-    const netProfit = revenue - expenses;
-
-    const avgRevenuePerMile = miles ? Number((revenue / miles).toFixed(2)) : 0;
-    const avgExpensePerMile = miles ? Number((expenses / miles).toFixed(2)) : 0;
+    prevTotalMiles += previousFinancials.totalMiles;
+    prevTotalRevenue += previousFinancials.totalRevenue;
+    prevTotalFuelCost += previousFinancials.fuelCost;
+    prevTotalRepairCost += previousFinancials.repairCost;
+    prevTotalInsuranceCost += previousFinancials.insuranceCost;
+    prevTotalDriverPay += previousFinancials.totalDriverPay;
 
     trucksSummary.push({
       _id: truck._id,
       truckId: truck.truckId,
       plateNumber: truck.plateNumber,
       source: truck.source,
-      summary: {
-        totalLoads: truckLoads,
-        totalMiles: miles,
-        totalRevenue: Number(revenue.toFixed(2)),
-        fuelCost: Number(fuelCost.toFixed(2)),
-        repairCost: Number(repairCost.toFixed(2)),
-        insuranceCost: Number(insuranceCost.toFixed(2)),
-        driverPay: Number(driverPay.toFixed(2)),
-        totalExpenses: Number(expenses.toFixed(2)),
-        netProfit: Number(netProfit.toFixed(2)),
-        avgRevenuePerMile,
-        avgExpensePerMile,
-        currency: "USD",
-      },
+      summary: formatFinancialSummary(currentFinancials),
     });
-
-    totalLoads += truckLoads;
-    totalMiles += miles;
-    totalRevenue += revenue;
-    totalFuelCost += fuelCost;
-    totalRepairCost += repairCost;
-    totalInsuranceCost += insuranceCost;
-    totalDriverPay += driverPay;
   }
 
   const totalExpenses =
     totalFuelCost + totalRepairCost + totalInsuranceCost + totalDriverPay;
   const netProfit = totalRevenue - totalExpenses;
 
-  const avgRevenuePerMile = totalMiles
-    ? Number((totalRevenue / totalMiles).toFixed(2))
+  const avgRevenuePerMile = totalMiles ? totalRevenue / totalMiles : 0;
+  const avgExpensePerMile = totalMiles ? totalExpenses / totalMiles : 0;
+  const avgProfitPerMile = avgRevenuePerMile - avgExpensePerMile;
+  const profitMargin = totalRevenue ? (netProfit / totalRevenue) * 100 : 0;
+
+  const prevTotalExpenses =
+    prevTotalFuelCost +
+    prevTotalRepairCost +
+    prevTotalInsuranceCost +
+    prevTotalDriverPay;
+  const prevAvgRevenuePerMile = prevTotalMiles
+    ? prevTotalRevenue / prevTotalMiles
     : 0;
-  const avgExpensePerMile = totalMiles
-    ? Number((totalExpenses / totalMiles).toFixed(2))
+  const prevAvgExpensePerMile = prevTotalMiles
+    ? prevTotalExpenses / prevTotalMiles
+    : 0;
+  const prevAvgProfitPerMile = prevAvgRevenuePerMile - prevAvgExpensePerMile;
+  const prevProfitMargin = prevTotalRevenue
+    ? ((prevTotalRevenue - prevTotalExpenses) / prevTotalRevenue) * 100
     : 0;
 
-  await logger.info(
-    `All Trucks Summary | Trucks: ${trucks.length} | Loads: ${totalLoads}`
-  );
+  const changes = {
+    fuelCostChange: calculatePercentageChange(totalFuelCost, prevTotalFuelCost),
+    repairCostChange: calculatePercentageChange(
+      totalRepairCost,
+      prevTotalRepairCost
+    ),
+    insuranceCostChange: calculatePercentageChange(
+      totalInsuranceCost,
+      prevTotalInsuranceCost
+    ),
+    driverPayChange: calculatePercentageChange(
+      totalDriverPay,
+      prevTotalDriverPay
+    ),
+    avgRevenuePerMileChange: calculatePercentageChange(
+      avgRevenuePerMile,
+      prevAvgRevenuePerMile
+    ),
+    avgExpensePerMileChange: calculatePercentageChange(
+      avgExpensePerMile,
+      prevAvgExpensePerMile
+    ),
+    avgProfitPerMileChange: calculatePercentageChange(
+      avgProfitPerMile,
+      prevAvgProfitPerMile
+    ),
+    profitMarginChange: calculatePercentageChange(
+      profitMargin,
+      prevProfitMargin
+    ),
+  };
 
   return {
     period: { from, to },
@@ -299,8 +448,11 @@ export const getAllTrucksSummaryService = asyncHandler(async (req) => {
       driverPay: Number(totalDriverPay.toFixed(2)),
       totalExpenses: Number(totalExpenses.toFixed(2)),
       netProfit: Number(netProfit.toFixed(2)),
-      avgRevenuePerMile,
-      avgExpensePerMile,
+      avgRevenuePerMile: Number(avgRevenuePerMile.toFixed(2)),
+      avgExpensePerMile: Number(avgExpensePerMile.toFixed(2)),
+      avgProfitPerMile: Number(avgProfitPerMile.toFixed(2)),
+      profitMargin: Math.round(profitMargin),
+      ...changes,
       currency: "USD",
     },
   };

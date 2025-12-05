@@ -12,7 +12,7 @@ import {
 
 const logger = new Logger("palette");
 
-// 🟢 Create Palette
+// Create Palette
 export const createPaletteService = asyncHandler(async (body, userId) => {
   const { mode } = body;
 
@@ -48,7 +48,7 @@ export const createPaletteService = asyncHandler(async (body, userId) => {
   return newPalette;
 });
 
-// 🟢 Get All Palettes
+// Get All Palettes
 export const getAllPalettesService = asyncHandler(async (req) => {
   const result = await getAllService(paletteModel, req.query, "palette");
 
@@ -61,7 +61,7 @@ export const getAllPalettesService = asyncHandler(async (req) => {
   };
 });
 
-// 🟢 Get Palette By ID
+// Get Palette By ID
 export const getPaletteByIdService = asyncHandler(async (id) => {
   const palette = await getSpecificService(paletteModel, id);
 
@@ -74,7 +74,7 @@ export const getPaletteByIdService = asyncHandler(async (id) => {
   return palette;
 });
 
-// 🟢 Update Palette
+// Update Palette
 export const updatePaletteService = asyncHandler(async (id, body, userId) => {
   const palette = await paletteModel.findById(id);
   if (!palette) {
@@ -85,7 +85,7 @@ export const updatePaletteService = asyncHandler(async (id, body, userId) => {
     );
   }
 
-  // 🟡 Check if updating active field to true
+  // Check if updating active field to true
   if (body.active === true) {
     // Set all other palettes' active to false
     await paletteModel.updateMany(
@@ -109,7 +109,7 @@ export const updatePaletteService = asyncHandler(async (id, body, userId) => {
   return updatedPalette;
 });
 
-// 🟢 Delete Palette
+// Delete Palette
 export const deletePaletteService = asyncHandler(async (id) => {
   const palette = await paletteModel.findById(id);
   if (!palette) {

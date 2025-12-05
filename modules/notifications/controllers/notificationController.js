@@ -11,7 +11,7 @@ import {
 export const createNotification = asyncHandler(async (req, res) => {
   const notification = await createNotificationService(req.body);
   res.status(201).json({
-    message: "✅ Notification created successfully",
+    message: "Notification created successfully",
     data: notification,
   });
 });
@@ -19,19 +19,14 @@ export const createNotification = asyncHandler(async (req, res) => {
 export const createAndSendNotification = asyncHandler(async (req, res) => {
   const notification = await createAndSendNotificationService(req.body);
   res.status(201).json({
-    message: "✅ Notification sent successfully",
+    message: "Notification sent successfully",
     data: notification,
   });
 });
 
 export const getNotifications = asyncHandler(async (req, res) => {
   const result = await getNotificationsService(req.query, req.user);
-
-  const message =
-    req.user.role === "admin"
-      ? "✅ All notifications fetched successfully"
-      : "✅ Your notifications fetched successfully";
-
+  const message = "Your notifications fetched successfully";
   res.status(200).json({
     message,
     ...result,
@@ -45,7 +40,7 @@ export const markAsRead = asyncHandler(async (req, res) => {
     req.user.role
   );
   res.status(200).json({
-    message: "✅ Notification marked as read",
+    message: "Notification marked as read",
     data: notification,
   });
 });
@@ -53,7 +48,7 @@ export const markAsRead = asyncHandler(async (req, res) => {
 export const markAllAsRead = asyncHandler(async (req, res) => {
   const result = await markAllAsReadService(req.user._id, req.user.role);
   res.status(200).json({
-    message: `✅ ${result.modifiedCount} notifications marked as read`,
+    message: `${result.modifiedCount} notifications marked as read`,
     data: result,
   });
 });

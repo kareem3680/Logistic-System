@@ -60,7 +60,7 @@ export const createLoadService = asyncHandler(async (req) => {
     const result = await session.withTransaction(async () => {
       const existingLoad = await loadModel.findOne({ loadId }).session(session);
       if (existingLoad) {
-        throw new ApiError("⚠️ This Load ID already exists.", 400);
+        throw new ApiError("🛑 This Load ID already exists.", 400);
       }
 
       const driver = await driverModel.findOneAndUpdate(
@@ -68,14 +68,14 @@ export const createLoadService = asyncHandler(async (req) => {
         { status: "busy", assignedTruck: truckId, updatedBy: userId },
         { new: true, session }
       );
-      if (!driver) throw new ApiError("⚠️ Driver not available.", 400);
+      if (!driver) throw new ApiError("🛑 Driver not available.", 400);
 
       const truck = await truckModel.findOneAndUpdate(
         { _id: truckId, status: "available" },
         { status: "busy", assignedDriver: driverId, updatedBy: userId },
         { new: true, session }
       );
-      if (!truck) throw new ApiError("⚠️ Truck not available.", 400);
+      if (!truck) throw new ApiError("🛑 Truck not available.", 400);
 
       const [newLoad] = await loadModel.create(
         [
@@ -104,12 +104,11 @@ export const createLoadService = asyncHandler(async (req) => {
 
       if (driver.user) {
         notificationPayload = {
-          title: "🎯 New Load Assigned",
+          title: "New Load Assigned",
           refId: newLoad._id,
           message: `You have been assigned to a new load: ${newLoad.loadId}.`,
           module: "loads",
           importance: "high",
-          from: "system",
           toUser: [driver.user],
           toRole: ["admin"],
         };
@@ -174,20 +173,14 @@ export const updateLoadService = asyncHandler(async (req) => {
         .populate({ path: "driverId", select: "user" })
         .session(session);
 
-      if (!load) throw new ApiError("⚠️ Load not found", 404);
+      if (!load) throw new ApiError("🛑 Load not found", 404);
 
       if (req.files?.documents?.length) {
         newDocs = await uploadToDrive(req.files.documents);
         if (!newDocs.length)
           throw new ApiError("🛑 Failed to upload new documents", 500);
 
-        if (load.documents?.length) {
-          deleteFromDrive(load.documents.map((d) => d.fileId)).catch((err) =>
-            logger.error(`Failed to delete old documents for load ${id}`)
-          );
-        }
-
-        updates.documents = newDocs;
+        updates.documents = [...(load.documents || []), ...newDocs];
       }
 
       Object.entries(updates).forEach(([key, val]) => (load[key] = val));
@@ -198,12 +191,11 @@ export const updateLoadService = asyncHandler(async (req) => {
       // ------------ NEW NOTIFICATION ------------
       if (load.driverId?.user) {
         notificationPayload = {
-          title: "✏️ Load Updated",
+          title: "Load Updated",
           refId: load._id,
           message: `Your load ${load.loadId} has been updated.`,
           module: "loads",
           importance: "medium",
-          from: "system",
           toUser: [load.driverId.user],
           toRole: ["admin"],
         };
@@ -266,22 +258,43 @@ export const updateLoadStatusService = asyncHandler(async (req) => {
       let finalDeliveredAt = null;
       let cancelledAt = null;
 
-      if (status === "delivered" || status === "cancelled") {
-        const driverPromise = load.driverId
-          ? driverModel.findByIdAndUpdate(
-              load.driverId,
-              { status: "available", assignedTruck: null, updatedBy: userId },
-              { session }
-            )
-          : null;
+      let truckPromise = null;
+      let driverPromise = null;
 
-        const truckPromise = load.truckId
-          ? truckModel.findByIdAndUpdate(
-              load.truckId,
-              { status: "available", assignedDriver: null, updatedBy: userId },
-              { session }
-            )
-          : null;
+      if (status === "delivered" || status === "cancelled") {
+        // ---------------------------
+        // Update Driver
+        // ---------------------------
+        if (load.driverId) {
+          driverPromise = driverModel.findByIdAndUpdate(
+            load.driverId,
+            { status: "available", assignedTruck: null, updatedBy: userId },
+            { session }
+          );
+        }
+
+        // ---------------------------
+        // Update Truck
+        // ---------------------------
+        if (load.truckId) {
+          const updateTruckData = {
+            status: "available",
+            assignedDriver: null,
+            updatedBy: userId,
+          };
+
+          // totalMileage
+          if (status === "delivered") {
+            const loadMileage = load.distanceMiles || 0;
+            updateTruckData.$inc = { totalMileage: loadMileage };
+          }
+
+          truckPromise = truckModel.findByIdAndUpdate(
+            load.truckId,
+            updateTruckData,
+            { session }
+          );
+        }
 
         await Promise.all([driverPromise, truckPromise]);
 
@@ -301,22 +314,22 @@ export const updateLoadStatusService = asyncHandler(async (req) => {
       );
 
       if (!updatedLoad)
-        throw new ApiError("⚠️ Failed to update load status", 400);
+        throw new ApiError("🛑 Failed to update load status", 400);
 
       // ------------ NEW NOTIFICATION ------------
       if (load.driverId?.user) {
         notificationPayload = {
-          title: "📦 Load Status Updated",
+          title: "Load Status Updated",
           refId: updatedLoad._id,
           message: `Your load ${updatedLoad.loadId} status changed to: ${status}.`,
           module: "loads",
           importance: "high",
-          from: "system",
           toUser: [load.driverId.user],
           toRole: ["admin"],
         };
       }
       // -------------------------------------------
+
       await delCache("loads:*");
       await delCache("trucks:*");
       await delCache("drivers:*");
@@ -324,6 +337,7 @@ export const updateLoadStatusService = asyncHandler(async (req) => {
       await logger.info(
         `Load status updated | ${updatedLoad.loadId} -> ${status}`
       );
+
       return sanitizeLoad(updatedLoad);
     });
 

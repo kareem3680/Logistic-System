@@ -26,7 +26,7 @@ export const addCommentService = asyncHandler(async (req) => {
       .select("_id name");
     if (!currentDriver)
       throw new ApiError(
-        "🚫 This user is not linked to any driver account",
+        "🛑 This user is not linked to any driver account",
         404
       );
 
@@ -58,7 +58,7 @@ export const addCommentService = asyncHandler(async (req) => {
     if (commentType === "dispatcher") {
       // Notify all admins + employees
       await createAndSendNotificationService({
-        title: "💬 New Dispatcher Comment",
+        title: "New Dispatcher Comment",
         refId: load._id,
         message: `A dispatcher added a new comment on Load: ${load.loadId}.`,
         module: "loads",
@@ -70,7 +70,7 @@ export const addCommentService = asyncHandler(async (req) => {
       const driver = await driverModel.findById(load.driverId).select("user");
       if (driver?.user) {
         await createAndSendNotificationService({
-          title: "💬 New Comment on Your Load",
+          title: "New Comment on Your Load",
           refId: load._id,
           message: `Dispatcher added a new comment on Load: ${load.loadId}.`,
           module: "loads",
@@ -85,7 +85,7 @@ export const addCommentService = asyncHandler(async (req) => {
   if (userRole === "driver") {
     // Driver commented → Notify all dispatchers
     await createAndSendNotificationService({
-      title: "💬 Driver Comment",
+      title: "Driver Comment",
       refId: load._id,
       message: `Driver added a comment on Load: ${load.loadId}.`,
       module: "loads",
@@ -97,7 +97,7 @@ export const addCommentService = asyncHandler(async (req) => {
 
   // 6) Log & return
   await logger.info(
-    `🗨️ New comment added | LoadID: ${load.loadId} | By: ${userRole}`
+    `New comment added | LoadID: ${load.loadId} | By: ${userRole}`
   );
 
   return sanitizeLoad(load);
@@ -114,7 +114,7 @@ export const updateCommentService = asyncHandler(async (req) => {
 
   // 2) Find comment
   const comment = load.comments.id(commentId);
-  if (!comment) throw new ApiError("⚠️ Comment not found", 404);
+  if (!comment) throw new ApiError("🛑 Comment not found", 404);
 
   // 3) Update comment
   comment.text = text;
@@ -145,7 +145,7 @@ export const deleteCommentService = asyncHandler(async (req) => {
 
   // 2) Find comment index
   const comment = load.comments.id(commentId);
-  if (!comment) throw new ApiError("⚠️ Comment not found", 404);
+  if (!comment) throw new ApiError("🛑 Comment not found", 404);
 
   // 3) Remove comment
   comment.deleteOne();

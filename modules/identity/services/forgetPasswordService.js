@@ -59,7 +59,7 @@ export const resendResetCodeService = asyncHandler(async (email) => {
 
   if (!user.passwordResetCode || !user.passwordResetCodeExpiresAt) {
     throw new ApiError(
-      "⚠️ You haven’t requested a reset code yet. Please request a code first.",
+      "🛑 You haven’t requested a reset code yet. Please request a code first.",
       400
     );
   }
@@ -83,7 +83,7 @@ export const resendResetCodeService = asyncHandler(async (email) => {
 
   if (user.resetCodeRequests.length >= 5) {
     throw new ApiError(
-      "🚫 You have reached the limit reset code requests, try again later",
+      "🛑 You have reached the limit reset code requests, try again later",
       429
     );
   }

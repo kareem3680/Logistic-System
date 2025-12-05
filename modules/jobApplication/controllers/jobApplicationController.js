@@ -8,7 +8,7 @@ import {
 export const createJobApplication = asyncHandler(async (req, res) => {
   const app = await createJobApplicationService(req);
   res.status(201).json({
-    message: "✅ Application submitted successfully",
+    message: "Application submitted successfully",
     data: app,
   });
 });
@@ -16,7 +16,7 @@ export const createJobApplication = asyncHandler(async (req, res) => {
 export const getAllJobApplications = asyncHandler(async (req, res) => {
   const result = await getAllJobApplicationsService(req);
   res.status(200).json({
-    message: "📄 Job applications retrieved successfully",
+    message: "Job applications retrieved successfully",
     results: result.results,
     data: result.data,
     paginationResult: result.paginationResult,
@@ -26,7 +26,7 @@ export const getAllJobApplications = asyncHandler(async (req, res) => {
 export const updateJobApplicationStatus = asyncHandler(async (req, res) => {
   const updated = await updateJobApplicationStatusService(req);
   res.status(200).json({
-    message: "📝 Application status updated successfully",
+    message: "Application status updated successfully",
     data: updated,
   });
 });

@@ -48,6 +48,11 @@ const truckSchema = new Schema(
       required: [true, "fuelPerMile is required"],
     },
 
+    totalMileage: {
+      type: Number,
+      default: 0,
+    },
+
     status: {
       type: String,
       enum: ["available", "inactive", "busy"],

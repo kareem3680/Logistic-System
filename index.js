@@ -44,7 +44,7 @@ mountRoutes(app);
 // Welcome route
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "✅ Welcome to Logistic System Back-End API 🚀",
+    message: "Welcome to Styles Dispatch Management Back-End API 🚀",
   });
 });
 
@@ -62,7 +62,7 @@ const MODE = process.env.NODE_ENV;
 
 // Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
-  console.error(`💥 Uncaught Exception: ${err.name} | ${err.message}`);
+  console.error(`🛑 Uncaught Exception: ${err.name} | ${err.message}`);
   process.exit(1);
 });
 

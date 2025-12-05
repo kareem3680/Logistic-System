@@ -1,10 +1,23 @@
+const isEmpty = (value) => {
+  if (value instanceof Date) return false;
+  return (
+    value === undefined ||
+    value === null ||
+    (typeof value === "string" && value.trim() === "") ||
+    (Array.isArray(value) && value.length === 0) ||
+    (typeof value === "object" &&
+      !Array.isArray(value) &&
+      Object.keys(value).length === 0)
+  );
+};
+
 const sanitizeObject = (obj, fields) => {
   return Object.fromEntries(
     fields
       .map(([key, valueFn]) => {
         try {
           const value = valueFn(obj);
-          return value !== undefined ? [key, value] : null;
+          return !isEmpty(value) ? [key, value] : null;
         } catch {
           return null;
         }
@@ -285,21 +298,23 @@ export function sanitizeNotification(notification) {
     ["message", (n) => n.message],
     ["module", (n) => n.module],
     ["importance", (n) => n.importance],
-    ["from", (n) => n.from],
-    ["toRole", (n) => n.toRole],
+    [
+      "from",
+      (n) =>
+        n.from
+          ? `${n.from.name}${n.from.jobId ? " (" + n.from.jobId + ")" : ""}`
+          : undefined,
+    ],
     [
       "toUser",
       (n) =>
         Array.isArray(n.toUser)
           ? n.toUser.map((u) =>
-              sanitizeObject(u, [
-                ["id", (u) => u._id],
-                ["name", (u) => u.name],
-                ["email", (u) => u.email],
-              ])
+              u ? `${u.name}${u.jobId ? " (" + u.jobId + ")" : ""}` : undefined
             )
           : [],
     ],
+    ["toRole", (n) => n.toRole],
     ["status", (n) => n.status],
     ["createdAt", (n) => n.createdAt],
     ["updatedAt", (n) => n.updatedAt],
@@ -347,5 +362,135 @@ export function sanitizeCustomer(customer) {
     ["updatedBy", (c) => c.updatedBy?.name],
     ["createdAt", (c) => c.createdAt],
     ["updatedAt", (c) => c.updatedAt],
+  ]);
+}
+
+export function sanitizeTimeOff(timeOff) {
+  return sanitizeObject(timeOff, [
+    ["id", (t) => t._id],
+    ["requestId", (t) => t.requestId],
+    [
+      "driver",
+      (t) =>
+        t.driver
+          ? `${t.driver.name || ""}${
+              t.driver.driverId ? " (" + t.driver.driverId + ")" : ""
+            }`
+          : undefined,
+    ],
+    ["phone", (t) => t.driver.phone],
+    ["from", (t) => t.from],
+    ["to", (t) => t.to],
+    ["reason", (t) => t.reason],
+    ["status", (t) => t.status],
+    ["adminNote", (t) => t.adminNote],
+    [
+      "approvedBy",
+      (t) =>
+        t.approvedBy
+          ? `${t.approvedBy.name}${
+              t.approvedBy.jobId ? " (" + t.approvedBy.jobId + ")" : ""
+            }`
+          : undefined,
+    ],
+    [
+      "rejectedBy",
+      (t) =>
+        t.rejectedBy
+          ? `${t.rejectedBy.name}${
+              t.rejectedBy.jobId ? " (" + t.rejectedBy.jobId + ")" : ""
+            }`
+          : undefined,
+    ],
+    ["createdAt", (t) => t.createdAt],
+    ["updatedAt", (t) => t.updatedAt],
+  ]);
+}
+
+export function sanitizeConversation(conv) {
+  return sanitizeObject(conv, [
+    ["id", (c) => c._id],
+    [
+      "members",
+      (c) =>
+        Array.isArray(c.members)
+          ? c.members.map((u) => ({ id: u._id, name: u.name }))
+          : [],
+    ],
+    [
+      "lastMessage",
+      (c) =>
+        c.lastMessage
+          ? {
+              text: c.lastMessage.text,
+              sender: c.lastMessage.sender
+                ? {
+                    id: c.lastMessage.sender._id,
+                    name: c.lastMessage.sender.name,
+                  }
+                : null,
+              createdAt: c.lastMessage.createdAt,
+            }
+          : null,
+    ],
+    ["createdAt", (c) => c.createdAt],
+    ["updatedAt", (c) => c.updatedAt],
+  ]);
+}
+
+export function sanitizeMessage(msg) {
+  return sanitizeObject(msg, [
+    ["id", (m) => m._id],
+    ["conversationId", (m) => m.conversationId],
+    ["text", (m) => m.text],
+    [
+      "sender",
+      (m) => (m.sender ? { id: m.sender._id, name: m.sender.name } : null),
+    ],
+    ["seen", (m) => m.seen],
+    ["createdAt", (m) => m.createdAt],
+    ["updatedAt", (m) => m.updatedAt],
+  ]);
+}
+
+export function sanitizeMaintenance(m) {
+  return sanitizeObject(m, [
+    ["id", (m) => m._id],
+    ["type", (m) => m.type],
+    ["repeatBy", (m) => m.repeatBy],
+    ["intervalDays", (m) => m.intervalDays],
+    ["intervalMile", (m) => m.intervalMile],
+    ["remindBeforeDays", (m) => m.remindBeforeDays],
+    ["remindBeforeMile", (m) => m.remindBeforeMile],
+    ["createdBy", (m) => m.createdBy?.name],
+    ["updatedBy", (m) => m.updatedBy?.name],
+    [
+      "statusPerTruck",
+      (m) =>
+        Array.isArray(m.statusPerTruck) && m.statusPerTruck.length
+          ? m.statusPerTruck
+              .map((t) => {
+                if (!t.truck) return null;
+                const obj = {
+                  truckId: t.truck._id,
+                  plateNumber: t.truck.plateNumber,
+                  totalMileage: t.truck.totalMileage,
+                  status: t.status,
+                  nextDueDate: t.nextDueDate,
+                  nextDueMile: t.nextDueMile,
+                  lastDoneAt: t.lastDoneAt,
+                  lastDoneMile: t.lastDoneMile,
+                };
+                return Object.fromEntries(
+                  Object.entries(obj).filter(
+                    ([_, v]) => v !== undefined && v !== null
+                  )
+                );
+              })
+              .filter(Boolean)
+          : [],
+    ],
+    ["createdAt", (m) => m.createdAt],
+    ["updatedAt", (m) => m.updatedAt],
   ]);
 }

@@ -13,8 +13,8 @@ dotenv.config({ path: "config.env", quiet: true });
 
 const env = {
   apiKey: process.env.BREVO_API_KEY,
-  from: process.env.EMAIL_FROM,
-  brand: process.env.EMAIL_BRAND_NAME,
+  from: process.env.EMAIL_FROM || "noreply@stylesdispatch.com",
+  brand: process.env.EMAIL_BRAND_NAME || "Styles Dispatch",
 };
 
 // Basic HTML escaping for safe text insertion

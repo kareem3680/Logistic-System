@@ -10,7 +10,7 @@ import ApiError from "../../../utils/apiError.js";
 import Logger from "../../../utils/loggerService.js";
 const logger = new Logger("auth");
 
-// ✅ Register user
+// Register user
 export const registerUser = asyncHandler(async (userData, req) => {
   const existingUser = await userModel.findOne({ email: userData.email });
   if (existingUser) {
@@ -25,7 +25,7 @@ export const registerUser = asyncHandler(async (userData, req) => {
 
   sendEmail({
     email: user.email,
-    subject: "Welcome to Logistic System!",
+    subject: "Welcome to Styles Dispatch",
     message:
       "Your account has been successfully created!\nThank you for joining us.",
   }).catch((err) =>
@@ -36,7 +36,7 @@ export const registerUser = asyncHandler(async (userData, req) => {
   return { user: sanitizeUser(user), token };
 });
 
-// ✅ Login user
+// Login user
 export const loginUser = asyncHandler(async (email, password) => {
   const user = await userModel.findOne({ email }).select("+password");
   if (!user) {
@@ -63,7 +63,7 @@ export const loginUser = asyncHandler(async (email, password) => {
   return { user: sanitizeUser(user), token };
 });
 
-// ✅ Protect route
+// Protect route
 export const protect = asyncHandler(async (req) => {
   let token;
   if (
@@ -77,7 +77,7 @@ export const protect = asyncHandler(async (req) => {
   return user;
 });
 
-// ✅ Role-based authorization
+// Role-based authorization
 export const allowedTo = asyncHandler(async (user, roles) => {
   if (!roles.includes(user.role)) {
     throw new ApiError("🚫 You are not authorized to access this route", 403);

@@ -7,6 +7,8 @@ import mountRoutesJobApplication from "./jobApplication/routes/index.js";
 import mountRoutesDriverDashboard from "./driverDashboard/routes/index.js";
 import mountRoutesCustomer from "./customer/routes/index.js";
 import mountRoutesUiSetting from "./uiSetting/routes/index.js";
+import mountRoutesConv from "./conv/routes/index.js";
+import mountRoutesMaintenance from "./maintenance/routes/index.js";
 
 export default function mountRoutes(app) {
   mountRoutesIdentity(app);
@@ -18,4 +20,6 @@ export default function mountRoutes(app) {
   mountRoutesDriverDashboard(app);
   mountRoutesCustomer(app);
   mountRoutesUiSetting(app);
+  mountRoutesConv(app);
+  mountRoutesMaintenance(app);
 }

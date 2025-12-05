@@ -28,7 +28,7 @@ export const createUserService = asyncHandler(async (body) => {
 
   sendEmail({
     email: newUser.email,
-    subject: "Welcome to Logistic System!",
+    subject: "Welcome to Styles Dispatch",
     message:
       "Your account has been successfully created!\nThank you for joining us.",
   }).catch((err) =>

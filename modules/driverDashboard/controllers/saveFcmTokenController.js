@@ -14,7 +14,7 @@ export const saveFcmToken = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    message: "✅ FCM token saved successfully",
+    message: "FCM token saved successfully",
     data: { userId: user._id, fcmTokens: user.fcmTokens },
   });
 });

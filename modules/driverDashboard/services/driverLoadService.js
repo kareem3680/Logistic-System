@@ -49,7 +49,7 @@ export const getAllLoadsService = asyncHandler(async (req) => {
 
       if (!currentDriver) {
         throw new ApiError(
-          "🚫 This user is not linked to any driver account",
+          "🛑 This user is not linked to any driver account",
           404
         );
       }
@@ -68,13 +68,13 @@ export const getAllLoadsService = asyncHandler(async (req) => {
       });
 
       await logger.info(
-        `Driver ${currentDriver._id} - 📦 Loads retrieved successfully (${result.results} results)`
+        `Driver ${currentDriver._id} - Loads retrieved successfully (${result.results} results)`
       );
 
       const data = result.data.map((l) => sanitizeDriverLoad(l));
 
       return {
-        message: "📦 Loads retrieved successfully",
+        message: "Loads retrieved successfully",
         results: result.results,
         period: {
           from: lastFriday,
@@ -98,7 +98,7 @@ export const addDriverDocumentsService = asyncHandler(async (req) => {
     .findOne({ user: userId })
     .select("_id name");
   if (!currentDriver)
-    throw new ApiError("🚫 This user is not linked to any driver account", 404);
+    throw new ApiError("🛑 This user is not linked to any driver account", 404);
 
   // 2) Find load assigned to this driver
   const load = await loadModel.findOne({
@@ -111,7 +111,7 @@ export const addDriverDocumentsService = asyncHandler(async (req) => {
 
   // 3) Check for uploaded files
   if (!req.files?.documentsForDriver?.length)
-    throw new ApiError("⚠️ Please upload at least one document (PDF)", 400);
+    throw new ApiError("🛑 Please upload at least one document (PDF)", 400);
 
   let uploadedDocs = [];
 
@@ -136,7 +136,7 @@ export const addDriverDocumentsService = asyncHandler(async (req) => {
 
     // 6) Send Notifications to admins and employees
     await createAndSendNotificationService({
-      title: "📄 Driver Uploaded Documents",
+      title: "Driver Uploaded Documents",
       refId: load._id,
       message: `Driver ${currentDriver.name} uploaded ${uploadedDocs.length} documents for Load: ${load.loadId}.`,
       module: "loads",

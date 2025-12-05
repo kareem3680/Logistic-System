@@ -179,6 +179,7 @@ export const getNotificationsService = asyncHandler(
       filter,
       {
         populate: [{ path: "toUser", select: "name jobId" }],
+        populate: [{ path: "from", select: "name jobId" }],
       }
     );
 

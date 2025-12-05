@@ -14,7 +14,7 @@ export const updateMyPassword = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    message: "🔑 Password updated successfully",
+    message: "Password updated successfully",
     data: user,
     token,
   });

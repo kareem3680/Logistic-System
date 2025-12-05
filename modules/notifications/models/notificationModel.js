@@ -16,7 +16,7 @@ const notificationSchema = new Schema(
     },
     module: {
       type: String,
-      enum: ["system", "loads", "trucks", "drivers", "identity"],
+      enum: ["system", "loads", "trucks", "drivers", "identity", "maintenance"],
       default: "system",
     },
     importance: {
@@ -25,8 +25,8 @@ const notificationSchema = new Schema(
       default: "low",
     },
     from: {
-      type: String,
-      default: "system",
+      type: Schema.ObjectId,
+      ref: "User",
     },
     toRole: {
       type: [String],

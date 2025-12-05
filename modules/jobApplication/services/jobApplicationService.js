@@ -41,7 +41,7 @@ export const createJobApplicationService = asyncHandler(async (req) => {
   sendEmail({
     email,
     subject: `Application Received for ${jobTitle}`,
-    message: `Hello ${fullName},\n\nThank you for applying for the ${jobTitle} position at Logistic System.\nWe’ve received your application and our team will review it soon.\n\nBest regards,\nLogistic System HR Team`,
+    message: `Hello ${fullName},\n\nThank you for applying for the ${jobTitle} position at Styles Dispatch.\nWe’ve received your application and our team will review it soon.\n\nBest regards,\nStyles Dispatch HR Team`,
   }).catch((err) =>
     logger.error("Email sending failed", { error: err.message })
   );

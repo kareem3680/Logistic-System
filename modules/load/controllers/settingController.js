@@ -9,7 +9,7 @@ import {
 export const getSettings = asyncHandler(async (req, res) => {
   const settings = await getSettingsService();
   res.status(200).json({
-    message: "⚙️ Settings fetched successfully",
+    message: "Settings fetched successfully",
     data: settings,
   });
 });
@@ -17,7 +17,7 @@ export const getSettings = asyncHandler(async (req, res) => {
 export const createSetting = asyncHandler(async (req, res) => {
   const setting = await createSettingService(req.body);
   res.status(201).json({
-    message: "✅ Setting created successfully",
+    message: "Setting created successfully",
     data: setting,
   });
 });
@@ -28,7 +28,7 @@ export const updateSetting = asyncHandler(async (req, res) => {
     req.body.value
   );
   res.status(200).json({
-    message: "🔄 Setting updated successfully",
+    message: "Setting updated successfully",
     data: updatedSetting,
   });
 });
