@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "29074f51-7840-4023-aaae-41f095a86a0f",
-		"name": "Logistic System",
+		"_postman_id": "a1d14eef-7f72-48c1-90df-e8c01f5153ed",
+		"name": "Styles Dispatch Managment",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "38670371"
+		"_exporter_id": "48758854",
+		"_collection_link": "https://stylestech2-3215592.postman.co/workspace/StylesTech's-Team's-Workspace~83ec1f3f-7eaa-4748-8628-a9252608258a/collection/48758854-a1d14eef-7f72-48c1-90df-e8c01f5153ed?action=share&source=collection_link&creator=48758854"
 	},
 	"item": [
 		{
@@ -648,6 +649,184 @@
 			]
 		},
 		{
+			"name": "Chat",
+			"item": [
+				{
+					"name": "CreateOrGetConversation",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"691cd25c892a726616f52f1d\"\n}"
+						},
+						"url": {
+							"raw": "{{MainHost}}/api/v1/chat/conversations/start",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"chat",
+								"conversations",
+								"start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetUserConversations",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/chat/conversations",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"chat",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "addMessage",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"text\": \"Hello from Postman!\"\n}"
+						},
+						"url": {
+							"raw": "{{MainHost}}/api/v1/chat/messages/692dbe84052701023aa03c5e",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"chat",
+								"messages",
+								"692dbe84052701023aa03c5e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getConversationMessages",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/chat/messages/692dbe84052701023aa03c5e",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"chat",
+								"messages",
+								"692dbe84052701023aa03c5e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "markMessagesSeen",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/chat/messages/seen/692dc77a1f8744e2331ff717",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"chat",
+								"messages",
+								"seen",
+								"692dc77a1f8744e2331ff717"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "adminDashboard",
 			"item": [
 				{
@@ -900,6 +1079,179 @@
 								"adminDashboard",
 								"activate",
 								"68d54eb71a883f6b507a26e0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Maintenance",
+			"item": [
+				{
+					"name": "createMaintenance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"Oil Change\",\n    \"repeatBy\": \"mile\",\n    \"intervalMile\": 5000,\n    \"remindBeforeMile\": 500,\n    \"statusPerTruck\": [\n        {\n            \"truck\": \"691cd7a5ad9929e6f68403a0\",\n            \"lastDoneMile\": 300\n        },\n        {\n            \"truck\": \"691cd7c8ad9929e6f68403ae\",\n            \"lastDoneMile\": 200\n        },\n        {\n            \"truck\": \"691dc25a70481156e84ac1da\",\n            \"lastDoneMile\": 100\n        }\n    ]\n}\n// {\n//     \"type\": \"Oil Change\",\n//     \"repeatBy\": \"time\",\n//     \"intervalDays\": 500,\n//     \"remindBeforeDays\": 5,\n//     \"statusPerTruck\": [\n//         {\n//             \"truck\": \"691cd7a5ad9929e6f68403a0\",\n//             \"lastDoneAt\": \"2025-11-10\"\n//         },\n//         {\n//             \"truck\": \"691cd7c8ad9929e6f68403ae\",\n//             \"lastDoneAt\": \"2025-12-02\"\n//         },\n//         {\n//             \"truck\": \"691dc25a70481156e84ac1da\",\n//             \"lastDoneAt\": \"2025-07-08\"\n//         }\n//     ]\n// }"
+						},
+						"url": {
+							"raw": "{{MainHost}}/api/v1/maintenances",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"maintenances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getAllMaintenances",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/maintenances",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"maintenances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateMaintenance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"Oil Change\",\n    \"repeatBy\": \"mile\",\n    \"intervalMile\": 5000,\n    \"remindBeforeMile\": 500,\n    \"statusPerTruck\": [\n        {\n            \"truck\": \"691cd7a5ad9929e6f68403a0\",\n            \"lastDoneMile\": 300\n        },\n        {\n            \"truck\": \"691cd7c8ad9929e6f68403ae\",\n            \"lastDoneMile\": 200\n        },\n        {\n            \"truck\": \"691dc25a70481156e84ac1da\",\n            \"lastDoneMile\": 100\n        }\n    ]\n}\n// {\n//     \"type\": \"Oil Change\",\n//     \"repeatBy\": \"time\",\n//     \"intervalDays\": 500,\n//     \"remindBeforeDays\": 5,\n//     \"statusPerTruck\": [\n//         {\n//             \"truck\": \"691cd7a5ad9929e6f68403a0\",\n//             \"lastDoneAt\": \"2025-11-10\"\n//         },\n//         {\n//             \"truck\": \"691cd7c8ad9929e6f68403ae\",\n//             \"lastDoneAt\": \"2025-12-02\"\n//         },\n//         {\n//             \"truck\": \"691dc25a70481156e84ac1da\",\n//             \"lastDoneAt\": \"2025-07-08\"\n//         }\n//     ]\n// }"
+						},
+						"url": {
+							"raw": "{{MainHost}}/api/v1/maintenances/693092fac870de8eba64ea39",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"maintenances",
+								"693092fac870de8eba64ea39"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSingleMaintenance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/maintenances/69317ef56d1e88e50e94493e",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"maintenances",
+								"69317ef56d1e88e50e94493e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteMaintenance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/maintenances/69317ef56d1e88e50e94493e",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"maintenances",
+								"69317ef56d1e88e50e94493e"
 							]
 						}
 					},
@@ -1165,6 +1517,176 @@
 								"driver-dashboard",
 								"pay-check",
 								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createTimeOff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"from\": \"2025-12-01\",\n    \"to\": \"2025-12-03\",\n    \"reason\": \"Personal\"\n}"
+						},
+						"url": {
+							"raw": "{{MainHost}}/api/v1/driver-dashboard/time-off",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"driver-dashboard",
+								"time-off"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getMyTimeOff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/my",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"driver-dashboard",
+								"time-off",
+								"my"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-driverId",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "driverId",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "name phone",
+									"disabled": true
+								},
+								{
+									"key": "from",
+									"value": "2025-11-01",
+									"disabled": true
+								},
+								{
+									"key": "to",
+									"value": "2025-12-01",
+									"disabled": true
+								},
+								{
+									"key": "pricePerMile[lte]",
+									"value": "0.4",
+									"disabled": true
+								},
+								{
+									"key": "pricePerMile[gte]",
+									"value": "0.1",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "busy",
+									"disabled": true
+								},
+								{
+									"key": "keyword",
+									"value": "john",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "cancelMyTimeOff",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"cancelled\"\n}"
+						},
+						"url": {
+							"raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/cancel/692876973d5c075358dc8f32",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"driver-dashboard",
+								"time-off",
+								"cancel",
+								"692876973d5c075358dc8f32"
 							]
 						}
 					},
@@ -1635,7 +2157,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Test Notification\",\n    \"message\": \"Hello from Postman\",\n    \"module\": \"system\",\n    \"importance\": \"low\",\n    \"toUser\": \"691cd20d892a726616f52f04\"\n}"
+							"raw": "{\n    \"title\": \"Test Notification\",\n    \"message\": \"Hello from Postman\",\n    \"module\": \"system\",\n    \"importance\": \"low\",\n    \"toUser\": [\"691cd20d892a726616f52f04\"]\n}"
 						},
 						"url": {
 							"raw": "{{MainHost}}/api/v1/notifications/send",
@@ -2184,6 +2706,136 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "getAllTimeOffs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/all",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"driver-dashboard",
+								"time-off",
+								"all"
+							],
+							"query": [
+								{
+									"key": "sort",
+									"value": "-driverId",
+									"disabled": true
+								},
+								{
+									"key": "sort",
+									"value": "driverId",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "name phone",
+									"disabled": true
+								},
+								{
+									"key": "from",
+									"value": "2025-11-01",
+									"disabled": true
+								},
+								{
+									"key": "to",
+									"value": "2025-12-01",
+									"disabled": true
+								},
+								{
+									"key": "pricePerMile[lte]",
+									"value": "0.4",
+									"disabled": true
+								},
+								{
+									"key": "pricePerMile[gte]",
+									"value": "0.1",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "busy",
+									"disabled": true
+								},
+								{
+									"key": "keyword",
+									"value": "john",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateTimeOffStatus",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"rejected\",\n  \"adminNote\": \"NO NO NO NO NO NO NO\"\n}"
+						},
+						"url": {
+							"raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/status/6928874138d1fbf66ba7c155",
+							"host": [
+								"{{MainHost}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"driver-dashboard",
+								"time-off",
+								"status",
+								"6928874138d1fbf66ba7c155"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -2478,17 +3130,17 @@
 								},
 								{
 									"key": "loadId",
-									"value": "Q-009",
+									"value": "Q-3000",
 									"type": "text"
 								},
 								{
 									"key": "driverId",
-									"value": "6909f2273c8295ffd50301c7",
+									"value": "691cd60fad9929e6f68402c0",
 									"type": "text"
 								},
 								{
 									"key": "truckId",
-									"value": "691c713c0ce183c282b6dedf",
+									"value": "691cd7c8ad9929e6f68403ae",
 									"type": "text"
 								},
 								{

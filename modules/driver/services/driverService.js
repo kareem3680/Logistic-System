@@ -19,7 +19,7 @@ const logger = new Logger("driver");
 export const createDriverService = asyncHandler(async (body, userId) => {
   const { email, assignedTruck, licenseNumber, user } = body;
 
-  // 🛑 Check for email duplication
+  // Check for email duplication
   if (email) {
     const existingEmail = await driverModel.findOne({ email });
     if (existingEmail) {
@@ -30,7 +30,7 @@ export const createDriverService = asyncHandler(async (body, userId) => {
     }
   }
 
-  // 🛑 Check for licenseNumber duplication
+  // Check for licenseNumber duplication
   if (licenseNumber) {
     const existingLicense = await driverModel.findOne({ licenseNumber });
     if (existingLicense) {
@@ -44,7 +44,7 @@ export const createDriverService = asyncHandler(async (body, userId) => {
     }
   }
 
-  // 🛑 Check if user exists and has driver role
+  // Check if user exists and has driver role
   if (user) {
     const userExists = await userModel.findById(user);
     if (!userExists) {
@@ -78,7 +78,7 @@ export const createDriverService = asyncHandler(async (body, userId) => {
     }
   }
 
-  // 🛑 Check if assignedTruck exists (and validate id)
+  // Check if assignedTruck exists (and validate id)
   if (assignedTruck) {
     const truckExists = await truckModel.findById(assignedTruck);
     if (!truckExists) {
@@ -88,7 +88,7 @@ export const createDriverService = asyncHandler(async (body, userId) => {
       throw new ApiError("🛑 Assigned truck not found", 404);
     }
 
-    // 🛑 Check if truck is available
+    // Check if truck is available
     if (truckExists.status !== "available") {
       await logger.error("Driver creation failed - truck is not available", {
         assignedTruck,
@@ -186,7 +186,7 @@ export const updateDriverService = asyncHandler(async (id, body, userId) => {
     throw new ApiError(`🛑 Cannot update. No driver found with ID: ${id}`, 404);
   }
 
-  // 🛑 Check email uniqueness
+  // Check email uniqueness
   if (email) {
     const existingEmail = await driverModel.findOne({ email });
     if (
@@ -198,7 +198,7 @@ export const updateDriverService = asyncHandler(async (id, body, userId) => {
     }
   }
 
-  // 🛑 Check for licenseNumber duplication
+  // Check for licenseNumber duplication
   if (licenseNumber) {
     const existingLicense = await driverModel.findOne({ licenseNumber });
     if (existingLicense) {
@@ -212,7 +212,7 @@ export const updateDriverService = asyncHandler(async (id, body, userId) => {
     }
   }
 
-  // 🛑 Check if user exists and has driver role
+  // Check if user exists and has driver role
   if (user) {
     const userExists = await userModel.findById(user);
     if (!userExists) {
@@ -246,7 +246,7 @@ export const updateDriverService = asyncHandler(async (id, body, userId) => {
     }
   }
 
-  // 🛑 Check if assignedTruck exists (and validate id)
+  // Check if assignedTruck exists (and validate id)
   if (assignedTruck) {
     const truckExists = await truckModel.findById(assignedTruck);
     if (!truckExists) {
@@ -256,7 +256,7 @@ export const updateDriverService = asyncHandler(async (id, body, userId) => {
       throw new ApiError("🛑 Assigned truck not found", 404);
     }
 
-    // 🛑 Check if truck is available
+    // Check if truck is available
     if (truckExists.status !== "available") {
       await logger.error("Driver creation failed - truck is not available", {
         assignedTruck,

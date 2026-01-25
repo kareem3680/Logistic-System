@@ -61,8 +61,8 @@ export const updateUserValidator = [
 
   check("role")
     .optional()
-    .isIn(["admin", "employee"])
-    .withMessage("[Role must be either admin, employee]"),
+    .isIn(["admin", "employee", "driver"])
+    .withMessage("Role must be either admin, employee, or driver"),
 
   check("position")
     .optional()

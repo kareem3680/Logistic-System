@@ -6,12 +6,38 @@ const messageSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Conversation",
       required: true,
+      index: true,
     },
-    sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    text: { type: String, required: true },
-    seen: { type: Boolean, default: false },
+    sender: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    text: {
+      type: String,
+      required: true,
+      maxlength: 10000,
+    },
+    seen: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    sequenceNumber: {
+      type: Number,
+      required: true,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
+
+// Compound index for ordering messages by sequence
+messageSchema.index({ conversationId: 1, sequenceNumber: 1 }, { unique: true });
+
+// Index for seen status queries
+messageSchema.index({ conversationId: 1, seen: 1, sender: 1 });
 
 export default model("Message", messageSchema);

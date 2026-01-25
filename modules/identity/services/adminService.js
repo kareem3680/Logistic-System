@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 
 import sendEmail from "../../../utils/sendEmail.js";
 import userModel from "../models/userModel.js";
+import driverModel from "../../driver/models/driverModel.js";
 import { sanitizeUser } from "../../../utils/sanitizeData.js";
 import ApiError from "../../../utils/apiError.js";
 import {
@@ -9,6 +10,7 @@ import {
   getAllService,
   getSpecificService,
 } from "../../../utils/servicesHandler.js";
+import { delCache } from "../../../utils/cache.js";
 import Logger from "../../../utils/loggerService.js";
 const logger = new Logger("admin");
 
@@ -118,6 +120,14 @@ export const deactivateUserService = asyncHandler(async (id) => {
     throw new Error("User not found");
   }
 
+  if (user.role === "driver") {
+    await driverModel.findOneAndUpdate(
+      { user: user._id },
+      { status: "inactive" }
+    );
+    await delCache("drivers:*");
+  }
+
   await logger.info("User deactivated", { id });
   return user;
 });
@@ -131,6 +141,14 @@ export const activateUserService = asyncHandler(async (id) => {
 
   if (!user) {
     throw new Error("User not found");
+  }
+
+  if (user.role === "driver") {
+    await driverModel.findOneAndUpdate(
+      { user: user._id },
+      { status: "available" }
+    );
+    await delCache("drivers:*");
   }
 
   await logger.info("User activated", { id });

@@ -5,7 +5,7 @@ import userModel from "../../identity/models/userModel.js";
 import notificationModel from "../models/notificationModel.js";
 import ApiError from "../../../utils/apiError.js";
 import { sanitizeNotification } from "../../../utils/sanitizeData.js";
-import { getIo } from "../../../config/socket.js";
+import { getIo } from "../../../io/index.js";
 import {
   createService,
   getAllService,
@@ -178,8 +178,10 @@ export const getNotificationsService = asyncHandler(
       "notification",
       filter,
       {
-        populate: [{ path: "toUser", select: "name jobId" }],
-        populate: [{ path: "from", select: "name jobId" }],
+        populate: [
+          { path: "toUser", select: "name jobId" },
+          { path: "from", select: "name jobId" },
+        ],
       }
     );
 

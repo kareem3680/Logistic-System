@@ -11,24 +11,50 @@ import Logger from "../../../utils/loggerService.js";
 const logger = new Logger("summary");
 
 // ====== Helper Functions ======
-const getWeekPeriod = (date = new Date()) => {
-  const day = date.getDay();
+const normalizeToDateOnly = (input) => {
+  if (!input) return new Date().toISOString().split("T")[0];
+
+  if (input instanceof Date) {
+    return input.toISOString().split("T")[0];
+  }
+
+  return input.split("T")[0];
+};
+
+const getWeekPeriod = (inputDate = null) => {
+  const dateStr = normalizeToDateOnly(inputDate);
+
+  const [year, month, day] = dateStr.split("-").map(Number);
+
+  // Prevent timezone shift
+  const date = new Date(year, month - 1, day, 12, 0, 0);
+
+  const weekday = date.getDay();
   let lastFriday = new Date(date);
   let nextThursday = new Date(date);
 
-  if (day === 5) {
+  if (weekday === 5) {
     nextThursday.setDate(lastFriday.getDate() + 6);
-  } else if (day === 4) {
+  } else if (weekday === 4) {
     lastFriday.setDate(date.getDate() - 6);
   } else {
-    const daysSinceFriday = (day + 2) % 7;
+    const daysSinceFriday = (weekday + 2) % 7;
     lastFriday.setDate(date.getDate() - daysSinceFriday);
     nextThursday.setDate(lastFriday.getDate() + 6);
   }
 
-  const formatDate = (d) => d.toISOString().split("T")[0];
+  const format = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
 
-  return { from: formatDate(lastFriday), to: formatDate(nextThursday) };
+  return { from: format(lastFriday), to: format(nextThursday) };
+};
+
+const buildDayRange = (dateString) => {
+  const start = new Date(`${dateString}T00:00:00.000Z`);
+  const end = new Date(`${dateString}T23:59:59.999Z`);
+  return { $gte: start, $lte: end };
 };
 
 const calculateTruckFinancials = (
@@ -113,14 +139,15 @@ export const getDriverLoadSummaryService = asyncHandler(async (req) => {
     to = weekPeriod.to;
   }
 
-  const startDate = new Date(from);
-  const endDate = new Date(to);
+  // *** ONLY UPDATED HERE → real date range ***
+  const startDate = buildDayRange(from).$gte;
+  const endDate = new Date(`${to}T23:59:59.999Z`);
 
   const loads = await loadModel
     .find({
       driverId: id,
       status: "delivered",
-      createdAt: { $gte: startDate, $lte: endDate },
+      deliveredAt: { $gte: startDate, $lte: endDate },
     })
     .populate("driverId", "driverId name phone")
     .populate("truckId", "truckId model plateNumber");

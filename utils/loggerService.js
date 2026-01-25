@@ -102,7 +102,7 @@ export const cleanOldLogs = () => {
       );
     });
   } catch (err) {
-    console.error("🚫 Error cleaning logs:", err);
+    console.error("🛑 Error cleaning logs:", err);
   }
 };
 

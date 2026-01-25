@@ -20,7 +20,7 @@ import { protect, allowedTo } from "../controllers/authController.js";
 
 router
   .route("/")
-  .get(protect, allowedTo("admin"), getUsers)
+  .get(protect, allowedTo("admin", "employee"), getUsers)
   .post(protect, allowedTo("admin"), createUserValidator, createUser);
 
 router

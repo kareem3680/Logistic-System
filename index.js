@@ -9,7 +9,7 @@ import cors from "cors";
 
 // Security & utils
 import "./utils/cronJob.js";
-import { initSocket } from "./config/socket.js";
+import { initSocket } from "./io/index.js";
 import applySecurity from "./middlewares/securityMiddleware.js";
 import globalError from "./middlewares/errorMiddleware.js";
 import ApiError from "./utils/apiError.js";
@@ -31,8 +31,12 @@ applySecurity(app);
 // CORS
 app.use(
   cors({
-    origin: "*",
-  })
+    origin: [
+      process.env.MAIN_HOST_DEV,
+      process.env.MAIN_HOST_PROD,
+      process.env.LOCAL_HOST,
+    ],
+  }),
 );
 
 // Dev logging
@@ -88,7 +92,7 @@ process.on("uncaughtException", (err) => {
 
     // Initialize Socket.io
     initSocket(server);
-    console.log("🟢 Socket.io initialized");
+    console.log("🟢 Socket.IO server");
 
     // Handle unhandled promise rejections
     process.on("unhandledRejection", async (err) => {

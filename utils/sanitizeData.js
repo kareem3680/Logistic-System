@@ -77,6 +77,7 @@ export function sanitizeTruck(truck) {
     ["type", (t) => t.type],
     ["source", (t) => t.source],
     ["year", (t) => t.year],
+    ["totalMileage", (t) => t.totalMileage],
     ["capacity", (t) => t.capacity],
     ["fuelPerMile", (t) => t.fuelPerMile],
     ["status", (t) => t.status],
@@ -309,9 +310,9 @@ export function sanitizeNotification(notification) {
       "toUser",
       (n) =>
         Array.isArray(n.toUser)
-          ? n.toUser.map((u) =>
-              u ? `${u.name}${u.jobId ? " (" + u.jobId + ")" : ""}` : undefined
-            )
+          ? n.toUser
+              .filter((u) => u)
+              .map((u) => `${u.name}${u.jobId ? " (" + u.jobId + ")" : ""}`)
           : [],
     ],
     ["toRole", (n) => n.toRole],

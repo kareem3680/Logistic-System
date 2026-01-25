@@ -16,7 +16,15 @@ const notificationSchema = new Schema(
     },
     module: {
       type: String,
-      enum: ["system", "loads", "trucks", "drivers", "identity", "maintenance"],
+      enum: [
+        "system",
+        "loads",
+        "trucks",
+        "drivers",
+        "identity",
+        "maintenance",
+        "chat",
+      ],
       default: "system",
     },
     importance: {

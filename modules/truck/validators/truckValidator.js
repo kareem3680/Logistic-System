@@ -41,6 +41,14 @@ export const createTruckValidator = [
     .isInt({ min: 2010, max: new Date().getFullYear() + 1 })
     .withMessage("Year must be a valid number between 2010 and next year"),
 
+  check("totalMileage")
+    .notEmpty()
+    .withMessage("totalMileage is required")
+    .isNumeric()
+    .withMessage("totalMileage must be a number")
+    .custom((value) => value >= 0)
+    .withMessage("totalMileage must be greater than or equal to 0"),
+
   check("capacity")
     .notEmpty()
     .withMessage("Truck capacity is required")
@@ -92,6 +100,13 @@ export const updateTruckValidator = [
     .optional()
     .isInt({ min: 2010, max: new Date().getFullYear() + 1 })
     .withMessage("Year must be a valid number between 2010 and next year"),
+
+  check("totalMileage")
+    .optional()
+    .isNumeric()
+    .withMessage("totalMileage must be a number")
+    .custom((value) => value >= 0)
+    .withMessage("totalMileage must be greater than or equal to 0"),
 
   check("capacity")
     .optional()

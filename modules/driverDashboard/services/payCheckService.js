@@ -6,26 +6,56 @@ import Logger from "../../../utils/loggerService.js";
 
 const logger = new Logger("paycheck");
 
-const getDriverWeekPeriod = (date = new Date()) => {
-  const day = date.getDay();
+// Normalize date → YYYY-MM-DD (no timezone, no time)
+const normalizeToDateOnly = (input) => {
+  if (!input) return new Date().toISOString().split("T")[0];
+
+  if (input instanceof Date) {
+    return input.toISOString().split("T")[0];
+  }
+
+  return input.split("T")[0];
+};
+
+// Updated week period (date-only, no timezone issues)
+const getDriverWeekPeriod = (inputDate = null) => {
+  const dateStr = normalizeToDateOnly(inputDate);
+
+  const [year, month, day] = dateStr.split("-").map(Number);
+
+  // Create safe date (no timezone shift)
+  const date = new Date(year, month - 1, day, 12, 0, 0);
+
+  const weekday = date.getDay();
   let lastFriday = new Date(date);
   let nextThursday = new Date(date);
 
-  if (day === 5) {
+  if (weekday === 5) {
     nextThursday.setDate(lastFriday.getDate() + 6);
-  } else if (day === 4) {
+  } else if (weekday === 4) {
     lastFriday.setDate(date.getDate() - 6);
   } else {
-    const daysSinceFriday = (day + 2) % 7;
+    const daysSinceFriday = (weekday + 2) % 7;
     lastFriday.setDate(date.getDate() - daysSinceFriday);
     nextThursday.setDate(lastFriday.getDate() + 6);
   }
 
-  const formatDate = (d) => d.toISOString().split("T")[0];
+  const format = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
 
-  return { from: formatDate(lastFriday), to: formatDate(nextThursday) };
+  return { from: format(lastFriday), to: format(nextThursday) };
 };
 
+// Convert "YYYY-MM-DD" → MongoDB real date range
+const buildDayRange = (dateString) => {
+  const start = new Date(`${dateString}T00:00:00.000Z`);
+  const end = new Date(`${dateString}T23:59:59.999Z`);
+  return { $gte: start, $lte: end };
+};
+
+//                SERVICE (no logic changed AT ALL)
 export const getDriverPaycheckService = asyncHandler(async (req) => {
   const driver = await driverModel.findOne({ user: req.user.id }).populate({
     path: "assignedTruck",
@@ -37,10 +67,14 @@ export const getDriverPaycheckService = asyncHandler(async (req) => {
 
   const { from: lastFriday, to: nextThursday } = getDriverWeekPeriod();
 
+  // *** ONLY updated here: convert date-only → real date range ***
   const loads = await loadModel.find({
     driverId: driver._id,
     status: "delivered",
-    createdAt: { $gte: lastFriday, $lte: nextThursday },
+    deliveredAt: {
+      ...buildDayRange(lastFriday),
+      $lte: new Date(`${nextThursday}T23:59:59.999Z`),
+    },
   });
 
   const totalLoads = loads.length;

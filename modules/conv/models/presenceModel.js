@@ -2,12 +2,29 @@ import { Schema, model } from "mongoose";
 
 const presenceSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", unique: true },
-    online: { type: Boolean, default: false },
-    socketId: { type: String },
-    lastSeen: { type: Date },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      unique: true,
+      required: true,
+      index: true,
+    },
+    online: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    lastSeen: {
+      type: Date,
+      index: true,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
+
+// Index for querying online users
+presenceSchema.index({ online: 1, lastSeen: -1 });
 
 export default model("Presence", presenceSchema);

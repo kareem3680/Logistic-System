@@ -13,24 +13,51 @@ import { cacheWrapper, delCache } from "../../../utils/cache.js";
 
 const logger = new Logger("load");
 
-const getDriverWeekPeriod = (date = new Date()) => {
-  const day = date.getDay();
+const normalizeToDateOnly = (input) => {
+  if (!input) return new Date().toISOString().split("T")[0];
+
+  if (input instanceof Date) {
+    return input.toISOString().split("T")[0];
+  }
+
+  return input.split("T")[0];
+};
+
+const getDriverWeekPeriod = (inputDate = null) => {
+  const dateStr = normalizeToDateOnly(inputDate);
+
+  const [year, month, day] = dateStr.split("-").map(Number);
+
+  // Avoid timezone shifting
+  const date = new Date(year, month - 1, day, 12, 0, 0);
+
+  const weekday = date.getDay();
   let lastFriday = new Date(date);
   let nextThursday = new Date(date);
 
-  if (day === 5) {
+  if (weekday === 5) {
     nextThursday.setDate(lastFriday.getDate() + 6);
-  } else if (day === 4) {
+  } else if (weekday === 4) {
     lastFriday.setDate(date.getDate() - 6);
   } else {
-    const daysSinceFriday = (day + 2) % 7;
+    const daysSinceFriday = (weekday + 2) % 7;
     lastFriday.setDate(date.getDate() - daysSinceFriday);
     nextThursday.setDate(lastFriday.getDate() + 6);
   }
 
-  const formatDate = (d) => d.toISOString().split("T")[0];
+  const format = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
 
-  return { from: formatDate(lastFriday), to: formatDate(nextThursday) };
+  return { from: format(lastFriday), to: format(nextThursday) };
+};
+
+// Convert "YYYY-MM-DD" → real range for MongoDB
+const buildDayRange = (dateString) => {
+  const start = new Date(`${dateString}T00:00:00.000Z`);
+  const end = new Date(`${dateString}T23:59:59.999Z`);
+  return { $gte: start, $lte: end };
 };
 
 export const getAllLoadsService = asyncHandler(async (req) => {
@@ -41,8 +68,6 @@ export const getAllLoadsService = asyncHandler(async (req) => {
   return await cacheWrapper(
     cacheKey,
     async () => {
-      const filter = {};
-
       const currentDriver = await driverModel
         .findOne({ user: req.user._id })
         .select("_id");
@@ -54,14 +79,23 @@ export const getAllLoadsService = asyncHandler(async (req) => {
         );
       }
 
-      filter.driverId = currentDriver._id;
-
       const { from: lastFriday, to: nextThursday } = getDriverWeekPeriod();
 
-      filter.createdAt = { $gte: lastFriday, $lte: nextThursday };
+      const dateRange = {
+        $gte: new Date(`${lastFriday}T00:00:00.000Z`),
+        $lte: new Date(`${nextThursday}T23:59:59.999Z`),
+      };
 
-      if (status) filter.status = status;
+      const filter = {};
+
       if (truckId && Types.ObjectId.isValid(truckId)) filter.truckId = truckId;
+
+      filter.$or = [
+        { status: { $nin: ["delivered", "cancelled"] } },
+        { status: { $in: ["delivered", "cancelled"] }, createdAt: dateRange },
+      ];
+
+      filter.driverId = currentDriver._id;
 
       const result = await getAllService(loadModel, req.query, "load", filter, {
         populate: [{ path: "truckId", select: "type model" }],
@@ -146,7 +180,7 @@ export const addDriverDocumentsService = asyncHandler(async (req) => {
     });
 
     await logger.info(
-      `📄 Driver ${currentDriver._id} uploaded ${uploadedDocs.length} docs for Load ${id}`
+      `Driver ${currentDriver._id} uploaded ${uploadedDocs.length} docs for Load ${id}`
     );
 
     return sanitizeDriverLoad(load);
