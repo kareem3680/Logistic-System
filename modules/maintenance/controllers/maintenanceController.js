@@ -11,7 +11,12 @@ import {
 // Create Maintenance
 // -----------------------------
 export const createMaintenance = asyncHandler(async (req, res) => {
-  const maintenance = await createMaintenanceService(req.body, req.user._id);
+  const maintenance = await createMaintenanceService(
+    req.body,
+    req.user._id,
+    req.companyId,
+    req.user.role,
+  );
 
   res.status(201).json({
     status: "success",
@@ -23,7 +28,11 @@ export const createMaintenance = asyncHandler(async (req, res) => {
 // Get All Maintenances
 // -----------------------------
 export const getMaintenances = asyncHandler(async (req, res) => {
-  const result = await getAllMaintenancesService(req);
+  const result = await getAllMaintenancesService(
+    req,
+    req.companyId,
+    req.user.role,
+  );
 
   res.status(200).json({
     status: "success",
@@ -38,7 +47,11 @@ export const getMaintenances = asyncHandler(async (req, res) => {
 // Get Single Maintenance
 // -----------------------------
 export const getMaintenance = asyncHandler(async (req, res) => {
-  const maintenance = await getMaintenanceByIdService(req.params.id);
+  const maintenance = await getMaintenanceByIdService(
+    req.params.id,
+    req.companyId,
+    req.user.role,
+  );
 
   res.status(200).json({
     status: "success",
@@ -53,7 +66,9 @@ export const updateMaintenance = asyncHandler(async (req, res) => {
   const maintenance = await updateMaintenanceService(
     req.params.id,
     req.body,
-    req.user._id
+    req.user._id,
+    req.companyId,
+    req.user.role,
   );
 
   res.status(200).json({
@@ -66,7 +81,7 @@ export const updateMaintenance = asyncHandler(async (req, res) => {
 // Delete Maintenance
 // -----------------------------
 export const deleteMaintenance = asyncHandler(async (req, res) => {
-  await deleteMaintenanceService(req.params.id);
+  await deleteMaintenanceService(req.params.id, req.companyId, req.user.role);
 
   res.status(204).send();
 });

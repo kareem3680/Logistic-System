@@ -5,6 +5,8 @@ class PresenceManager {
   constructor() {
     // Map: userId -> Set<socketId>
     this.userConnections = new Map();
+    // Map: socketId -> userId (for reverse lookup)
+    this.socketToUser = new Map();
   }
 
   /**
@@ -19,10 +21,12 @@ class PresenceManager {
     }
 
     this.userConnections.get(userId).add(socketId);
+    this.socketToUser.set(socketId, userId);
+
     const count = this.userConnections.get(userId).size;
 
     logger.info(
-      `Presence: User ${userId} added socket ${socketId} (total: ${count})`
+      `Presence: User ${userId} added socket ${socketId} (total: ${count})`,
     );
 
     return count;
@@ -41,6 +45,7 @@ class PresenceManager {
 
     const userSockets = this.userConnections.get(userId);
     userSockets.delete(socketId);
+    this.socketToUser.delete(socketId);
 
     const remaining = userSockets.size;
 
@@ -49,10 +54,19 @@ class PresenceManager {
     }
 
     logger.info(
-      `Presence: User ${userId} removed socket ${socketId} (remaining: ${remaining})`
+      `Presence: User ${userId} removed socket ${socketId} (remaining: ${remaining})`,
     );
 
     return remaining;
+  }
+
+  /**
+   * Get user ID by socket ID
+   * @param {string} socketId
+   * @returns {string|null}
+   */
+  getUserIdBySocket(socketId) {
+    return this.socketToUser.get(socketId) || null;
   }
 
   /**
@@ -106,6 +120,12 @@ class PresenceManager {
    * @param {string} userId
    */
   clearUser(userId) {
+    const sockets = this.userConnections.get(userId);
+    if (sockets) {
+      for (const socketId of sockets) {
+        this.socketToUser.delete(socketId);
+      }
+    }
     const cleared = this.userConnections.delete(userId);
     if (cleared) {
       logger.info(`Presence: Cleared all connections for user ${userId}`);

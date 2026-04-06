@@ -21,7 +21,7 @@ export const registerUser = asyncHandler(async (userData, req) => {
   }
 
   const user = await userModel.create(userData);
-  const token = createToken(user._id);
+  const token = createToken(user);
 
   sendEmail({
     email: user.email,
@@ -29,7 +29,7 @@ export const registerUser = asyncHandler(async (userData, req) => {
     message:
       "Your account has been successfully created!\nThank you for joining us.",
   }).catch((err) =>
-    logger.error("Email sending failed", { error: err.message })
+    logger.error("Email sending failed", { error: err.message }),
   );
 
   await logger.info("User registered successfully", { email: user.email });
@@ -48,7 +48,7 @@ export const loginUser = asyncHandler(async (email, password) => {
     await logger.error("Login failed - account deactivated", { email });
     throw new ApiError(
       "🛑 Your account has been deactivated. Please contact support.",
-      403
+      403,
     );
   }
 
@@ -58,7 +58,7 @@ export const loginUser = asyncHandler(async (email, password) => {
     throw new ApiError("🛑 Invalid email or password", 401);
   }
 
-  const token = createToken(user._id);
+  const token = createToken(user);
   await logger.info("User logged in successfully", { email });
   return { user: sanitizeUser(user), token };
 });

@@ -15,27 +15,22 @@ import {
   protect,
   allowedTo,
 } from "../../identity/controllers/authController.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
+
+// Protect all routes
+router.use(protect);
+router.use(setCompany);
 
 router
   .route("/truck")
-  .get(
-    protect,
-    allowedTo("admin"),
-    getAllTrucksSummaryValidator,
-    getAllTrucksSummary
-  );
+  .get(allowedTo("admin"), getAllTrucksSummaryValidator, getAllTrucksSummary);
 
 router
   .route("/truck/:id")
-  .get(protect, allowedTo("admin"), getTruckSummaryValidator, getTruckSummary);
+  .get(allowedTo("admin"), getTruckSummaryValidator, getTruckSummary);
 
 router
   .route("/driver/:id")
-  .get(
-    protect,
-    allowedTo("admin"),
-    getDriverSummaryValidator,
-    getDriverLoadSummary
-  );
+  .get(allowedTo("admin"), getDriverSummaryValidator, getDriverLoadSummary);
 
 export default router;

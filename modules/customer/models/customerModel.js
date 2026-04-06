@@ -47,8 +47,13 @@ const customerSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 customerSchema.plugin(AutoIncrement, {

@@ -22,7 +22,7 @@ const commentSchema = new Schema(
       ref: "User",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const loadSchema = new Schema(
@@ -140,6 +140,25 @@ const loadSchema = new Schema(
       min: [0, "Total price must be positive"],
     },
 
+    bonus: {
+      type: Number,
+      default: 0,
+    },
+
+    detention: {
+      type: Number,
+      default: 0,
+    },
+
+    deduction: {
+      type: Number,
+      default: 0,
+    },
+
+    reason: {
+      type: String,
+    },
+
     currency: {
       type: String,
       enum: ["USD", "EUR", "EGP", "GBP", "SAR"],
@@ -167,10 +186,23 @@ const loadSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+      index: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
+// Indexes
+loadSchema.index({ loadId: 1, companyId: 1 }, { unique: true });
+loadSchema.index({ driverId: 1, companyId: 1 });
+loadSchema.index({ truckId: 1, companyId: 1 });
+loadSchema.index({ status: 1, companyId: 1 });
+loadSchema.index({ createdAt: -1, companyId: 1 });
 commentSchema.index({ createdAt: -1 });
 
 const LoadModel = model("Load", loadSchema);

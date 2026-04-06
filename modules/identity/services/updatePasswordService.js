@@ -15,7 +15,7 @@ export const updateMyPasswordService = asyncHandler(
       await logger.error("User not found", { userId });
       throw new ApiError(
         "🛑 Current or new password is invalid. Please check and try again.",
-        400
+        400,
       );
     }
 
@@ -24,7 +24,7 @@ export const updateMyPasswordService = asyncHandler(
       await logger.error("Incorrect current password", { userId });
       throw new ApiError(
         "🛑 Current or new password is invalid. Please check and try again.",
-        400
+        400,
       );
     }
 
@@ -32,7 +32,7 @@ export const updateMyPasswordService = asyncHandler(
     user.changedPasswordAt = Date.now();
     await user.save();
 
-    const token = createToken(user._id);
+    const token = createToken(user);
 
     await logger.info("Password updated successfully", { userId: user._id });
 
@@ -40,5 +40,5 @@ export const updateMyPasswordService = asyncHandler(
       user: sanitizeUser(user),
       token,
     };
-  }
+  },
 );

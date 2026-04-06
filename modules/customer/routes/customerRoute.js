@@ -19,35 +19,41 @@ import {
   allowedTo,
 } from "../../identity/controllers/authController.js";
 
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
+
 router
   .route("/")
-  .get(protect, allowedTo("admin", "employee"), getCustomers)
+  .get(protect, setCompany, allowedTo("admin", "employee"), getCustomers)
   .post(
     protect,
+    setCompany,
     allowedTo("admin", "employee"),
     createCustomerValidator,
-    createCustomer
+    createCustomer,
   );
 
 router
   .route("/:id")
   .get(
     protect,
+    setCompany,
     allowedTo("admin", "employee"),
     getCustomerValidator,
-    getCustomer
+    getCustomer,
   )
   .patch(
     protect,
+    setCompany,
     allowedTo("admin", "employee"),
     updateCustomerValidator,
-    updateCustomer
+    updateCustomer,
   )
   .delete(
     protect,
+    setCompany,
     allowedTo("admin", "employee"),
     deleteCustomerValidator,
-    deleteCustomer
+    deleteCustomer,
   );
 
 export default router;

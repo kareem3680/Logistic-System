@@ -28,16 +28,25 @@ const messageSchema = new Schema(
       type: Number,
       required: true,
     },
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+      index: true,
+    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Compound index for ordering messages by sequence
-messageSchema.index({ conversationId: 1, sequenceNumber: 1 }, { unique: true });
+messageSchema.index(
+  { conversationId: 1, sequenceNumber: 1, companyId: 1 },
+  { unique: true },
+);
 
 // Index for seen status queries
-messageSchema.index({ conversationId: 1, seen: 1, sender: 1 });
+messageSchema.index({ conversationId: 1, seen: 1, sender: 1, companyId: 1 });
 
 export default model("Message", messageSchema);

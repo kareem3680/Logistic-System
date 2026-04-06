@@ -15,22 +15,31 @@ export function isValidObjectId(id) {
  * Validate conversation membership with optimized query
  * @param {string} conversationId - Conversation ID
  * @param {string} userId - User ID
+ * @param {string} companyId - Company ID (for isolation)
  * @returns {Promise<Object>}
  */
-export async function validateConversationMembership(conversationId, userId) {
+export async function validateConversationMembership(
+  conversationId,
+  userId,
+  companyId,
+) {
   try {
     // Optimized query: check existence without fetching all members
     const conv = await Conversation.findOne({
       _id: conversationId,
       members: userId,
+      companyId, // Add company isolation
     })
-      .select("_id members")
+      .select("_id members companyId")
       .maxTimeMS(5000)
       .lean();
 
     if (!conv) {
       // Determine if conversation exists but user is not a member
-      const exists = await Conversation.exists({ _id: conversationId });
+      const exists = await Conversation.exists({
+        _id: conversationId,
+        companyId,
+      });
 
       if (exists) {
         return {

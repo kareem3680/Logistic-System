@@ -25,6 +25,8 @@ export function handleSendMessage(io, socket, userId) {
   socket.on(
     SOCKET_EVENTS.SEND_MESSAGE,
     async ({ conversationId, text, tempId }, callback) => {
+      const companyId = socket.user?.companyId;
+
       // Validate conversation ID
       if (!isValidObjectId(conversationId)) {
         emitSocketError(socket, {
@@ -80,7 +82,8 @@ export function handleSendMessage(io, socket, userId) {
       // Validate conversation membership
       const membershipResult = await validateConversationMembership(
         conversationId,
-        userId
+        userId,
+        companyId,
       );
       if (!membershipResult.valid) {
         emitSocketError(socket, {
@@ -106,6 +109,8 @@ export function handleSendMessage(io, socket, userId) {
             conversationId,
             sender: userId,
             text: textValidation.sanitized,
+            companyId,
+            role: socket.user?.role,
           });
 
           // Send ACK to sender
@@ -136,7 +141,8 @@ export function handleSendMessage(io, socket, userId) {
             conversation,
             userId,
             textValidation.sanitized,
-            conversationId
+            conversationId,
+            companyId,
           );
         });
       } catch (error) {
@@ -147,8 +153,8 @@ export function handleSendMessage(io, socket, userId) {
           createSocketError(
             ERROR_MESSAGES.FAILED_TO_SEND,
             HTTP_STATUS.INTERNAL_ERROR,
-            error
-          )
+            error,
+          ),
         );
 
         if (typeof callback === "function") {
@@ -159,7 +165,7 @@ export function handleSendMessage(io, socket, userId) {
           });
         }
       }
-    }
+    },
   );
 }
 
@@ -169,12 +175,14 @@ export function handleSendMessage(io, socket, userId) {
  * @param {string} senderId
  * @param {string} messageText
  * @param {string} conversationId
+ * @param {string} companyId
  */
 async function handleMessageNotifications(
   conversation,
   senderId,
   messageText,
-  conversationId
+  conversationId,
+  companyId,
 ) {
   // Run in background
   setImmediate(async () => {
@@ -184,7 +192,7 @@ async function handleMessageNotifications(
 
       // Check who's offline
       const offlineMembers = receivers.filter(
-        (id) => !presenceManager.isUserOnline(id)
+        (id) => !presenceManager.isUserOnline(id),
       );
 
       if (offlineMembers.length === 0) {
@@ -192,25 +200,32 @@ async function handleMessageNotifications(
       }
 
       // Get sender name
-      const sender = await User.findById(senderId).select("name");
+      const sender = await User.findOne({ _id: senderId, companyId }).select(
+        "name",
+      );
       const senderName = sender?.name || "Unknown";
 
       // Batch notification to all offline members
-      await createAndSendNotificationService({
-        toUser: offlineMembers,
-        title: `New Message From ${senderName}`,
-        message:
-          messageText.length > 50
-            ? `${messageText.substring(0, 50)}...`
-            : messageText,
-        module: "chat",
-        importance: "high",
-        refId: conversationId,
-        from: senderId,
-      });
+      await createAndSendNotificationService(
+        {
+          toUser: offlineMembers,
+          title: `Message From ${senderName}`,
+          message:
+            messageText.length > 50
+              ? `${messageText.substring(0, 50)}...`
+              : messageText,
+          module: "chat",
+          importance: "high",
+          refId: conversationId,
+          from: senderId,
+        },
+        senderId,
+        companyId,
+        "driver",
+      ); // role can be dynamic
 
       logger.info(
-        `Sent notifications to ${offlineMembers.length} offline users`
+        `Sent notifications to ${offlineMembers.length} offline users in company ${companyId}`,
       );
     } catch (error) {
       logger.error("Notification error:", error);

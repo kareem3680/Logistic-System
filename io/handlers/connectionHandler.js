@@ -18,11 +18,21 @@ const logger = new Logger("socketConnection");
  */
 export async function handleConnection(io, socket) {
   const userId = socket.user?._id?.toString();
+  const companyId = socket.user?.companyId;
 
-  logger.info("Client connected:", socket.id, "User:", userId);
+  logger.info(
+    "Client connected:",
+    socket.id,
+    "User:",
+    userId,
+    "Company:",
+    companyId,
+  );
 
-  if (!userId) {
-    logger.error("Connection without userId - this should not happen");
+  if (!userId || !companyId) {
+    logger.error(
+      "Connection without userId or companyId - this should not happen",
+    );
     socket.disconnect(true);
     return;
   }
@@ -33,11 +43,12 @@ export async function handleConnection(io, socket) {
   // Set user online in database (only on first connection)
   if (connectionCount === 1) {
     try {
-      await setUserOnlineService(userId);
+      await setUserOnlineService(userId, companyId, socket.user?.role);
 
       // Broadcast to others that user is online
       socket.broadcast.emit(SOCKET_EVENTS.USER_ONLINE, {
         userId,
+        companyId,
         timestamp: Date.now(),
       });
     } catch (error) {
@@ -59,17 +70,18 @@ export async function handleConnection(io, socket) {
 export async function handleDisconnection(io, socket) {
   socket.on("disconnect", async (reason) => {
     const userId = socket.user?._id?.toString();
+    const companyId = socket.user?.companyId;
 
     logger.info(
-      `Client disconnected: ${socket.id}, User: ${userId}, Reason: ${reason}`
+      `Client disconnected: ${socket.id}, User: ${userId}, Company: ${companyId}, Reason: ${reason}`,
     );
 
-    if (!userId) return;
+    if (!userId || !companyId) return;
 
     // Remove from presence manager
     const remainingConnections = presenceManager.removeConnection(
       userId,
-      socket.id
+      socket.id,
     );
 
     // Clear rate limiter for this socket
@@ -81,11 +93,12 @@ export async function handleDisconnection(io, socket) {
     // Set user offline in database (only if no remaining connections)
     if (remainingConnections === 0) {
       try {
-        await setUserOfflineService(userId);
+        await setUserOfflineService(userId, companyId, socket.user?.role);
 
         // Broadcast to others that user is offline
         socket.broadcast.emit(SOCKET_EVENTS.USER_OFFLINE, {
           userId,
+          companyId,
           lastSeen: new Date().toISOString(),
           timestamp: Date.now(),
         });
@@ -103,11 +116,13 @@ export async function handleDisconnection(io, socket) {
 export function handlePing(socket) {
   socket.on(SOCKET_EVENTS.PING, (callback) => {
     const userId = socket.user?._id?.toString();
+    const companyId = socket.user?.companyId;
 
     if (typeof callback === "function") {
       callback({
         message: "pong",
         user: userId,
+        company: companyId,
         timestamp: Date.now(),
       });
     }

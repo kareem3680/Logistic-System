@@ -19,12 +19,13 @@ export function getUserRoom(userId) {
 }
 
 /**
- * Generate role-specific room name
+ * Generate role-specific room name (scoped by company)
  * @param {string} role
+ * @param {string} companyId - Company ID for isolation
  * @returns {string}
  */
-export function getRoleRoom(role) {
-  return `${ROOM_PREFIXES.ROLE}${role}`;
+export function getRoleRoom(role, companyId) {
+  return `${ROOM_PREFIXES.ROLE}${role}_${companyId}`;
 }
 
 /**
@@ -34,6 +35,7 @@ export function getRoleRoom(role) {
 export function joinUserRooms(socket) {
   const userId = socket.user?._id?.toString();
   const userRole = socket.user?.role;
+  const companyId = socket.user?.companyId;
 
   if (userId) {
     const userRoom = getUserRoom(userId);
@@ -41,10 +43,12 @@ export function joinUserRooms(socket) {
     console.log(`🔵 User ${userId} joined room: ${userRoom}`);
   }
 
-  if (userRole) {
-    const roleRoom = getRoleRoom(userRole);
+  if (userRole && companyId) {
+    const roleRoom = getRoleRoom(userRole, companyId);
     socket.join(roleRoom);
-    console.log(`🔵 User ${userId} joined role room: ${roleRoom}`);
+    console.log(
+      `🔵 User ${userId} joined role room: ${roleRoom} (Company: ${companyId})`,
+    );
   }
 }
 
@@ -55,7 +59,7 @@ export function joinUserRooms(socket) {
 export function leaveAllConversationRooms(socket) {
   const currentRooms = Array.from(socket.rooms);
   const conversationRooms = currentRooms.filter((room) =>
-    room.startsWith(ROOM_PREFIXES.CONVERSATION)
+    room.startsWith(ROOM_PREFIXES.CONVERSATION),
   );
 
   conversationRooms.forEach((room) => {
@@ -75,4 +79,13 @@ export function leaveAllConversationRooms(socket) {
 export function isInConversationRoom(socket, conversationId) {
   const roomName = getConversationRoom(conversationId);
   return socket.rooms.has(roomName);
+}
+
+/**
+ * Get all rooms a socket is in (for debugging)
+ * @param {Socket} socket
+ * @returns {string[]}
+ */
+export function getSocketRooms(socket) {
+  return Array.from(socket.rooms);
 }

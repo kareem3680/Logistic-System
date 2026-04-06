@@ -30,7 +30,7 @@ const statusPerTruckValidator = (repeatBy, isRequired = true) => {
         if (repeatBy === "mile") {
           if (t.lastDoneMile === undefined || t.lastDoneMile === null)
             throw new Error(
-              `lastDoneMile is required for truck at index ${idx}`
+              `lastDoneMile is required for truck at index ${idx}`,
             );
         }
       });
@@ -92,6 +92,11 @@ export const createMaintenanceValidator = [
   body("repeatBy").custom((value, { req }) => {
     return statusPerTruckValidator(value, true).run(req);
   }),
+
+  body("serviceCenter")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid service center ID"),
 
   validationMiddleware,
 ];
@@ -162,6 +167,11 @@ export const updateMaintenanceValidator = [
       const repeatBy = req.body.repeatBy || req.existingRepeatBy;
       return statusPerTruckValidator(repeatBy, false).run(req);
     }),
+
+  body("serviceCenter")
+    .optional()
+    .isMongoId()
+    .withMessage("Invalid service center ID"),
 
   validationMiddleware,
 ];

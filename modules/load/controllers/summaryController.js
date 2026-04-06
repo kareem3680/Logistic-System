@@ -6,7 +6,12 @@ import {
 } from "../services/summaryService.js";
 
 export const getDriverLoadSummary = asyncHandler(async (req, res) => {
-  const summary = await getDriverLoadSummaryService(req);
+  const summary = await getDriverLoadSummaryService(
+    req,
+    req.companyId,
+    req.user.role,
+  );
+
   res.status(200).json({
     message: "Driver load summary retrieved successfully",
     data: summary,
@@ -14,7 +19,8 @@ export const getDriverLoadSummary = asyncHandler(async (req, res) => {
 });
 
 export const getTruckSummary = asyncHandler(async (req, res, next) => {
-  const data = await getTruckSummaryService(req);
+  const data = await getTruckSummaryService(req, req.companyId, req.user.role);
+
   res.status(200).json({
     status: "success",
     message: "Truck load summary retrieved successfully",
@@ -23,7 +29,12 @@ export const getTruckSummary = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllTrucksSummary = asyncHandler(async (req, res, next) => {
-  const data = await getAllTrucksSummaryService(req);
+  const data = await getAllTrucksSummaryService(
+    req,
+    req.companyId,
+    req.user.role,
+  );
+
   res.status(200).json({
     status: "success",
     message: "Trucks load summary retrieved successfully",

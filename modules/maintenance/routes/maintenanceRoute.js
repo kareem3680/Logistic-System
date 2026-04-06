@@ -5,6 +5,7 @@ import {
   protect,
   allowedTo,
 } from "../../identity/controllers/authController.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
 
 import {
   createMaintenance,
@@ -22,6 +23,7 @@ import {
 } from "../validators/maintenanceValidator.js";
 
 router.use(protect);
+router.use(setCompany);
 
 router
   .route("/")

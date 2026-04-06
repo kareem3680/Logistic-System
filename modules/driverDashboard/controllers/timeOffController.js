@@ -8,7 +8,7 @@ import {
 } from "../services/timeOffService.js";
 
 export const createTimeOff = asyncHandler(async (req, res) => {
-  const timeOff = await createTimeOffService(req);
+  const timeOff = await createTimeOffService(req, req.companyId, req.user.role);
 
   res.status(201).json({
     message: "TimeOff request created successfully",
@@ -17,7 +17,7 @@ export const createTimeOff = asyncHandler(async (req, res) => {
 });
 
 export const getAllTimeOff = asyncHandler(async (req, res) => {
-  const result = await getAllTimeOffService(req);
+  const result = await getAllTimeOffService(req, req.companyId, req.user.role);
 
   res.status(200).json({
     message: result.message,
@@ -29,7 +29,7 @@ export const getAllTimeOff = asyncHandler(async (req, res) => {
 });
 
 export const getMyTimeOff = asyncHandler(async (req, res) => {
-  const result = await getMyTimeOffService(req);
+  const result = await getMyTimeOffService(req, req.companyId, req.user.role);
 
   res.status(200).json({
     message: result.message,
@@ -40,7 +40,11 @@ export const getMyTimeOff = asyncHandler(async (req, res) => {
 });
 
 export const updateTimeOffStatus = asyncHandler(async (req, res) => {
-  const timeOff = await updateTimeOffStatusService(req);
+  const timeOff = await updateTimeOffStatusService(
+    req,
+    req.companyId,
+    req.user.role,
+  );
 
   res.status(200).json({
     message: `TimeOff request ${timeOff.status} successfully`,
@@ -49,7 +53,7 @@ export const updateTimeOffStatus = asyncHandler(async (req, res) => {
 });
 
 export const cancelTimeOff = asyncHandler(async (req, res) => {
-  const timeOff = await cancelTimeOffService(req);
+  const timeOff = await cancelTimeOffService(req, req.companyId, req.user.role);
 
   res.status(200).json({
     message: "TimeOff request cancelled successfully",

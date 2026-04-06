@@ -18,8 +18,8 @@ import {
 import { cacheWrapper, delCache } from "../../../utils/cache.js";
 
 // helper: check driver exists
-const checkDriverExists = async (driverId) => {
-  const driver = await driverModel.findById(driverId);
+const checkDriverExists = async (driverId, companyId) => {
+  const driver = await driverModel.findOne({ _id: driverId, companyId });
   if (!driver) {
     await logger.error("Truck operation failed - driver not found", {
       driverId,
@@ -27,7 +27,6 @@ const checkDriverExists = async (driverId) => {
     throw new ApiError(`🛑 Driver not found for ID: ${driverId}`, 404);
   }
 
-  // 🛑 Check if driver is available
   if (driver.status !== "available") {
     await logger.error("Truck operation failed - driver not available", {
       driverId,
@@ -39,52 +38,64 @@ const checkDriverExists = async (driverId) => {
   return driver;
 };
 
-export const getAllTrucksService = asyncHandler(async (req) => {
-  const cacheKey = `all:${JSON.stringify(req.query)}`;
+export const getAllTrucksService = asyncHandler(
+  async (req, companyId, role) => {
+    if (!companyId) throw new ApiError("🛑 Company context is missing", 403);
 
-  return await cacheWrapper(
-    cacheKey,
-    async () => {
-      const result = await getAllService(truckModel, req.query, "truck");
+    const cacheKey = `all:${JSON.stringify(req.query)}:${companyId}`;
 
-      const filtersForStats = result.finalFilter;
+    return await cacheWrapper(
+      cacheKey,
+      async () => {
+        const result = await getAllService(
+          truckModel,
+          req.query,
+          "truck",
+          companyId,
+          {},
+          {},
+          role,
+        );
 
-      const total = await truckModel.countDocuments(filtersForStats);
-      const available = await truckModel.countDocuments({
-        ...filtersForStats,
-        status: "available",
-      });
-      const busy = await truckModel.countDocuments({
-        ...filtersForStats,
-        status: "busy",
-      });
-      const inactive = await truckModel.countDocuments({
-        ...filtersForStats,
-        status: "inactive",
-      });
+        const total = await truckModel.countDocuments({ companyId });
+        const available = await truckModel.countDocuments({
+          companyId,
+          status: "available",
+        });
+        const busy = await truckModel.countDocuments({
+          companyId,
+          status: "busy",
+        });
+        const inactive = await truckModel.countDocuments({
+          companyId,
+          status: "inactive",
+        });
 
-      const populatedData = await truckModel.populate(result.data, [
-        { path: "assignedDriver", select: "name driverId" },
-        { path: "createdBy", select: "name" },
-        { path: "updatedBy", select: "name" },
-      ]);
+        const populatedData = await truckModel.populate(result.data, [
+          { path: "assignedDriver", select: "name driverId" },
+          { path: "createdBy", select: "name" },
+          { path: "updatedBy", select: "name" },
+        ]);
 
-      await logger.info("Fetched all trucks");
+        await logger.info("Fetched all trucks");
 
-      return {
-        stats: { total, available, busy, inactive },
-        data: populatedData.map(sanitizeTruck),
-        results: result.results,
-        paginationResult: result.paginationResult,
-      };
-    },
-    undefined,
-    { namespace: "trucks" }
-  );
-});
+        return {
+          stats: { total, available, busy, inactive },
+          data: populatedData.map(sanitizeTruck),
+          results: result.results,
+          paginationResult: result.paginationResult,
+        };
+      },
+      undefined,
+      { namespace: "trucks" },
+    );
+  },
+);
 
-export const getTruckByIdService = asyncHandler(async (id) => {
-  const truck = await getSpecificService(truckModel, id);
+export const getTruckByIdService = asyncHandler(async (id, companyId, role) => {
+  if (!companyId) throw new ApiError("🛑 Company context is missing", 403);
+
+  const truck = await getSpecificService(truckModel, id, companyId, {}, role);
 
   const populatedTruck = await truck.populate([
     { path: "assignedDriver", select: "name driverId" },
@@ -96,89 +107,111 @@ export const getTruckByIdService = asyncHandler(async (id) => {
   return sanitizeTruck(populatedTruck);
 });
 
-export const createTruckService = asyncHandler(async (body, userId) => {
-  const { plateNumber, assignedDriver } = body;
+export const createTruckService = asyncHandler(
+  async (body, userId, companyId, role) => {
+    if (!companyId) throw new ApiError("🛑 Company context is missing", 403);
 
-  // 🛑 Check assigned driver
-  if (assignedDriver) {
-    await checkDriverExists(assignedDriver);
-  }
+    const { plateNumber, assignedDriver } = body;
 
-  // 🛑 Check plateNumber uniqueness
-  if (plateNumber) {
-    const existingTruck = await truckModel.findOne({ plateNumber });
-    if (existingTruck) {
-      await logger.error(
-        "Truck creation failed - plate number already exists",
-        {
-          plateNumber,
-        }
-      );
-      throw new ApiError(
-        `🛑 Plate number '${plateNumber}' is already in use`,
-        400
-      );
+    if (assignedDriver) {
+      await checkDriverExists(assignedDriver, companyId);
     }
-  }
 
-  const newTruck = await createService(truckModel, {
-    ...body,
-    createdBy: userId,
-  });
-
-  await delCache("trucks:*");
-
-  await logger.info("Truck created", { truckId: newTruck.truckId });
-  return sanitizeTruck(newTruck);
-});
-
-export const updateTruckService = asyncHandler(async (id, body, userId) => {
-  const { plateNumber, assignedDriver } = body;
-
-  const truck = await truckModel.findById(id);
-  if (!truck) {
-    await logger.error("Truck not found", { id });
-    throw new ApiError(`🛑 Cannot update. No truck found with ID: ${id}`, 404);
-  }
-
-  // 🛑 Check assigned driver
-  if (assignedDriver) {
-    await checkDriverExists(assignedDriver);
-  }
-
-  // 🛑 Check plateNumber uniqueness
-  if (plateNumber) {
-    const existingTruck = await truckModel.findOne({
-      plateNumber,
-      _id: { $ne: id },
-    });
-    if (existingTruck) {
-      await logger.error("Truck update failed - plate number already in use", {
+    if (plateNumber) {
+      const existingTruck = await truckModel.findOne({
         plateNumber,
+        companyId,
       });
+      if (existingTruck) {
+        await logger.error(
+          "Truck creation failed - plate number already exists",
+          { plateNumber },
+        );
+        throw new ApiError(
+          `🛑 Plate number '${plateNumber}' is already in use`,
+          400,
+        );
+      }
+    }
+
+    const newTruck = await createService(
+      truckModel,
+      {
+        ...body,
+        createdBy: userId,
+        companyId,
+      },
+      companyId,
+      role,
+    );
+
+    await delCache("trucks:*");
+
+    await logger.info("Truck created", { truckId: newTruck.truckId });
+    return sanitizeTruck(newTruck);
+  },
+);
+
+export const updateTruckService = asyncHandler(
+  async (id, body, userId, companyId, role) => {
+    if (!companyId) throw new ApiError("🛑 Company context is missing", 403);
+
+    const { plateNumber, assignedDriver } = body;
+
+    const truck = await truckModel.findOne({ _id: id, companyId });
+    if (!truck) {
+      await logger.error("Truck not found", { id });
       throw new ApiError(
-        `🛑 Plate number '${plateNumber}' is already in use`,
-        400
+        `🛑 Cannot update. No truck found with ID: ${id}`,
+        404,
       );
     }
-  }
 
-  const updatedTruck = await updateService(truckModel, id, {
-    ...body,
-    updatedBy: userId,
-  });
+    if (assignedDriver) {
+      await checkDriverExists(assignedDriver, companyId);
+    }
 
-  await delCache("trucks:*");
+    if (plateNumber) {
+      const existingTruck = await truckModel.findOne({
+        plateNumber,
+        companyId,
+        _id: { $ne: id },
+      });
+      if (existingTruck) {
+        await logger.error(
+          "Truck update failed - plate number already in use",
+          {
+            plateNumber,
+          },
+        );
+        throw new ApiError(
+          `🛑 Plate number '${plateNumber}' is already in use`,
+          400,
+        );
+      }
+    }
 
-  await logger.info("Truck updated", { id });
-  return sanitizeTruck(updatedTruck);
-});
+    const updatedTruck = await updateService(
+      truckModel,
+      id,
+      { ...body, updatedBy: userId },
+      companyId,
+      role,
+    );
 
-export const deleteTruckService = asyncHandler(async (id) => {
-  await deleteService(truckModel, id);
+    await delCache("trucks:*");
+
+    await logger.info("Truck updated", { id });
+    return sanitizeTruck(updatedTruck);
+  },
+);
+
+export const deleteTruckService = asyncHandler(async (id, companyId, role) => {
+  if (!companyId) throw new ApiError("🛑 Company context is missing", 403);
+
+  await deleteService(truckModel, id, companyId, role);
 
   await delCache("trucks:*");
 
   await logger.info("Truck deleted", { id });
-  return;
 });

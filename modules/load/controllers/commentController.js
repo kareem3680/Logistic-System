@@ -7,7 +7,7 @@ import {
 } from "../services/commentService.js";
 
 export const addComment = asyncHandler(async (req, res) => {
-  const load = await addCommentService(req);
+  const load = await addCommentService(req, req.companyId, req.user.role);
 
   res.status(201).json({
     message: "Comment added successfully",
@@ -16,7 +16,7 @@ export const addComment = asyncHandler(async (req, res) => {
 });
 
 export const updateComment = asyncHandler(async (req, res) => {
-  const load = await updateCommentService(req);
+  const load = await updateCommentService(req, req.companyId, req.user.role);
 
   res.status(200).json({
     message: "Comment updated successfully",
@@ -25,7 +25,7 @@ export const updateComment = asyncHandler(async (req, res) => {
 });
 
 export const deleteComment = asyncHandler(async (req, res) => {
-  const load = await deleteCommentService(req);
+  const load = await deleteCommentService(req, req.companyId, req.user.role);
 
   res.status(200).json({
     message: "Comment deleted successfully",
@@ -34,7 +34,7 @@ export const deleteComment = asyncHandler(async (req, res) => {
 });
 
 export const getComments = asyncHandler(async (req, res) => {
-  const result = await getCommentsService(req);
+  const result = await getCommentsService(req, req.companyId, req.user.role);
 
   res.status(200).json({
     message: "Comments retrieved successfully",

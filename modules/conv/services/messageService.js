@@ -11,9 +11,18 @@ const logger = new Logger("message");
  * Add message with sequence number (atomic)
  */
 export const addMessageService = asyncHandler(
-  async ({ conversationId, sender, text }) => {
-    const conversation = await Conversation.findById(conversationId);
-    if (!conversation) throw new ApiError("Conversation not found", 404);
+  async ({ conversationId, sender, text, companyId, role }) => {
+    // Validate company context
+    if (role !== "super-admin" && !companyId) {
+      throw new ApiError("🛑 Company context is missing", 403);
+    }
+
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      companyId,
+    });
+    if (!conversation)
+      throw new ApiError("Conversation not found in your company", 404);
 
     if (!conversation.members.includes(sender))
       throw new ApiError("You are not a member of this conversation", 403);
@@ -25,46 +34,63 @@ export const addMessageService = asyncHandler(
         $inc: { messageSequence: 1 },
         lastMessage: { text, sender, createdAt: new Date() },
       },
-      { new: true, select: "messageSequence" }
+      { new: true, select: "messageSequence" },
     );
 
-    // Create message with sequence number
+    // Create message with sequence number and companyId
     const message = await Message.create({
       conversationId,
       sender,
       text,
       sequenceNumber: updatedConversation.messageSequence,
+      companyId,
     });
 
     await logger.info("Message added", {
       messageId: message._id,
       conversationId,
       sequenceNumber: message.sequenceNumber,
+      companyId,
     });
 
     return sanitizeMessage(message);
-  }
+  },
 );
 
 /**
  * Get conversation messages
  */
 export const getConversationMessagesService = asyncHandler(
-  async (conversationId, currentUserId) => {
-    const conversation = await Conversation.findById(conversationId);
-    if (!conversation) throw new ApiError("Conversation not found", 404);
+  async (conversationId, currentUserId, companyId, role) => {
+    // Validate company context
+    if (role !== "super-admin" && !companyId) {
+      throw new ApiError("🛑 Company context is missing", 403);
+    }
+
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      companyId,
+    });
+    if (!conversation)
+      throw new ApiError("Conversation not found in your company", 404);
 
     if (!conversation.members.includes(currentUserId))
       throw new ApiError("You are not a member of this conversation", 403);
 
-    const messages = await Message.find({ conversationId })
+    const messages = await Message.find({
+      conversationId,
+      companyId,
+    })
       .sort({ sequenceNumber: 1 })
       .lean();
 
-    await logger.info("Fetched conversation messages", { conversationId });
+    await logger.info("Fetched conversation messages", {
+      conversationId,
+      companyId,
+    });
 
     return messages.map(sanitizeMessage);
-  }
+  },
 );
 
 /**
@@ -74,24 +100,35 @@ export const getConversationMessagesService = asyncHandler(
  * @param {string} messageId - Optional: mark up to this message
  */
 export const markMessagesSeenService = asyncHandler(
-  async (conversationId, userId, messageId = null) => {
-    const conversation = await Conversation.findById(conversationId);
-    if (!conversation) throw new ApiError("Conversation not found", 404);
+  async (conversationId, userId, messageId = null, companyId, role) => {
+    // Validate company context
+    if (role !== "super-admin" && !companyId) {
+      throw new ApiError("🛑 Company context is missing", 403);
+    }
+
+    const conversation = await Conversation.findOne({
+      _id: conversationId,
+      companyId,
+    });
+    if (!conversation)
+      throw new ApiError("Conversation not found in your company", 404);
 
     if (!conversation.members.includes(userId))
       throw new ApiError("You are not a member of this conversation", 403);
 
     let query = {
       conversationId,
+      companyId,
       sender: { $ne: userId },
       seen: false,
     };
 
     // If messageId provided, mark messages up to that sequence number
     if (messageId) {
-      const targetMessage = await Message.findById(messageId).select(
-        "sequenceNumber"
-      );
+      const targetMessage = await Message.findOne({
+        _id: messageId,
+        companyId,
+      }).select("sequenceNumber");
       if (targetMessage) {
         query.sequenceNumber = { $lte: targetMessage.sequenceNumber };
       }
@@ -104,11 +141,12 @@ export const markMessagesSeenService = asyncHandler(
       userId,
       messageId,
       count: result.modifiedCount,
+      companyId,
     });
 
     return {
       success: true,
       modifiedCount: result.modifiedCount,
     };
-  }
+  },
 );

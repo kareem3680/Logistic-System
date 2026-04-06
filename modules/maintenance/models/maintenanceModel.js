@@ -36,10 +36,23 @@ const maintenanceSchema = new Schema(
     cost: { type: Number, default: 0 },
     notes: { type: String, trim: true },
 
+    serviceCenter: {
+      type: Schema.Types.ObjectId,
+      ref: "ServiceCenter",
+      default: null,
+    },
+
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     updatedBy: { type: Schema.Types.ObjectId, ref: "User" },
+
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+      index: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Maintenance = mongoose.model("Maintenance", maintenanceSchema);

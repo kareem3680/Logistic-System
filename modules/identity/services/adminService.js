@@ -9,24 +9,53 @@ import {
   createService,
   getAllService,
   getSpecificService,
+  updateService,
 } from "../../../utils/servicesHandler.js";
 import { delCache } from "../../../utils/cache.js";
 import Logger from "../../../utils/loggerService.js";
+
 const logger = new Logger("admin");
 
-export const createUserService = asyncHandler(async (body) => {
-  const { ...rest } = body;
+/**
+ * ==============================
+ * CREATE USER
+ * ==============================
+ */
+export const createUserService = asyncHandler(async (req) => {
+  const { role, companyId: bodyCompanyId, ...rest } = req.body;
 
-  const existingUser = await userModel.findOne({ email: rest.email });
-
-  if (existingUser) {
-    await logger.error("User creation failed - email already exists", {
-      email: rest.email,
-    });
-    throw new ApiError("🛑 Email already exists", 400);
+  if (role === "super-admin") {
+    throw new ApiError("🚫 You cannot assign super-admin role", 403);
   }
 
-  const newUser = await createService(userModel, rest);
+  let companyIdToUse;
+
+  if (req.user.role === "super-admin") {
+    if (!bodyCompanyId) {
+      throw new ApiError("Company ID is required for super-admin", 400);
+    }
+    companyIdToUse = bodyCompanyId;
+  } else {
+    if (!req.companyId) {
+      throw new ApiError("Company context is required", 403);
+    }
+    companyIdToUse = req.companyId;
+  }
+
+  const existingUser = await userModel.findOne({
+    email: rest.email,
+    companyId: companyIdToUse,
+  });
+
+  if (existingUser) {
+    throw new ApiError("🛑 Email already exists for this company", 400);
+  }
+
+  const newUser = await createService(
+    userModel,
+    { ...rest, role },
+    companyIdToUse,
+  );
 
   sendEmail({
     email: newUser.email,
@@ -34,33 +63,52 @@ export const createUserService = asyncHandler(async (body) => {
     message:
       "Your account has been successfully created!\nThank you for joining us.",
   }).catch((err) =>
-    logger.error("Email sending failed", { error: err.message })
+    logger.error("Email sending failed", { error: err.message }),
   );
 
-  await logger.info("User created", { userId: newUser._id });
+  await delCache("companies:*");
+
+  await logger.info("User created", {
+    userId: newUser._id,
+    companyId: companyIdToUse,
+    createdBy: req.user._id,
+  });
+
   return sanitizeUser(newUser);
 });
 
+/**
+ * ==============================
+ * GET ALL USERS
+ * ==============================
+ */
 export const getUsersService = asyncHandler(async (req) => {
-  const result = await getAllService(userModel, req.query, "user");
+  const result = await getAllService(
+    userModel,
+    req.query,
+    "user",
+    req.companyId,
+  );
 
-  const filtersForStats = result.finalFilter;
+  const filters = { companyId: req.companyId };
 
-  const total = await userModel.countDocuments(filtersForStats);
+  const total = await userModel.countDocuments(filters);
   const drivers = await userModel.countDocuments({
-    ...filtersForStats,
+    ...filters,
     role: "driver",
   });
   const admins = await userModel.countDocuments({
-    ...filtersForStats,
+    ...filters,
     role: "admin",
   });
   const employee = await userModel.countDocuments({
-    ...filtersForStats,
+    ...filters,
     role: "employee",
   });
 
-  await logger.info("Fetched all users");
+  await logger.info("Fetched all users", {
+    companyId: req.companyId,
+  });
 
   return {
     stats: { total, drivers, admins, employee },
@@ -70,87 +118,94 @@ export const getUsersService = asyncHandler(async (req) => {
   };
 });
 
-export const getSpecificUserService = asyncHandler(async (id) => {
-  const user = await getSpecificService(userModel, id);
-  await logger.info("Fetched user", { id });
+/**
+ * ==============================
+ * GET SPECIFIC USER
+ * ==============================
+ */
+export const getSpecificUserService = asyncHandler(async (id, companyId) => {
+  const user = await getSpecificService(userModel, id, companyId);
+
+  await logger.info("Fetched user", { id, companyId });
   return sanitizeUser(user);
 });
 
+/**
+ * ==============================
+ * UPDATE USER ROLE
+ * ==============================
+ */
 export const updateUserRoleService = asyncHandler(
-  async (id, role, body = {}) => {
+  async (id, role, companyId) => {
     if (!role) {
-      await logger.error("Role is missing", { id });
-      throw new ApiError("🛑 Role is required to update the user", 400);
+      throw new ApiError("🛑 Role is required", 400);
     }
 
-    const user = await userModel.findById(id);
+    const user = await userModel.findOne({ _id: id, companyId });
     if (!user) {
-      await logger.error("User to update not found", { id });
-      throw new ApiError(`🛑 Cannot update. No user found with ID: ${id}`, 404);
-    }
-
-    if (body.email) {
-      const existingEmail = await userModel.findOne({ email: body.email });
-      if (
-        existingEmail &&
-        existingEmail._id.toString() !== user._id.toString()
-      ) {
-        await logger.error("Email already in use", { email: body.email });
-        throw new ApiError("🛑 E-Mail already exists", 400);
-      }
-      user.email = body.email;
+      throw new ApiError("🛑 User not found for this company", 404);
     }
 
     user.role = role;
     await user.save();
 
-    await logger.info("User role updated", { id, role });
+    await logger.info("User role updated", { id, role, companyId });
     return sanitizeUser(user);
-  }
+  },
 );
 
-export const deactivateUserService = asyncHandler(async (id) => {
-  const user = await userModel.findByIdAndUpdate(
-    id,
+/**
+ * ==============================
+ * DEACTIVATE USER
+ * ==============================
+ */
+export const deactivateUserService = asyncHandler(async (id, companyId) => {
+  const user = await userModel.findOneAndUpdate(
+    { _id: id, companyId },
     { active: false },
-    { new: true }
+    { new: true },
   );
 
   if (!user) {
-    throw new Error("User not found");
+    throw new ApiError("🛑 User not found for this company", 404);
   }
 
   if (user.role === "driver") {
     await driverModel.findOneAndUpdate(
-      { user: user._id },
-      { status: "inactive" }
+      { user: user._id, companyId },
+      { status: "inactive" },
     );
-    await delCache("drivers:*");
+    await delCache(`drivers:${companyId}:*`);
   }
 
-  await logger.info("User deactivated", { id });
-  return user;
+  await logger.info("User deactivated", { id, companyId });
+  return;
 });
 
-export const activateUserService = asyncHandler(async (id) => {
-  const user = await userModel.findByIdAndUpdate(
-    id,
+/**
+ * ==============================
+ * ACTIVATE USER
+ * ==============================
+ */
+export const activateUserService = asyncHandler(async (id, companyId) => {
+  const user = await userModel.findOneAndUpdate(
+    { _id: id, companyId },
     { active: true },
-    { new: true }
+    { new: true },
   );
 
   if (!user) {
-    throw new Error("User not found");
+    throw new ApiError("🛑 User not found for this company", 404);
   }
 
   if (user.role === "driver") {
     await driverModel.findOneAndUpdate(
-      { user: user._id },
-      { status: "available" }
+      { user: user._id, companyId },
+      { status: "available" },
     );
-    await delCache("drivers:*");
+    await delCache(`drivers:${companyId}:*`);
   }
 
-  await logger.info("User activated", { id });
-  return user;
+  await logger.info("User activated", { id, companyId });
+  return;
 });

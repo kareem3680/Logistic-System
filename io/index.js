@@ -147,7 +147,7 @@ function setupGracefulShutdown(io) {
 function getIo() {
   if (!ioInstance) {
     throw new Error(
-      "Socket.io has not been initialized. Call initSocket() first."
+      "Socket.io has not been initialized. Call initSocket() first.",
     );
   }
   return ioInstance;

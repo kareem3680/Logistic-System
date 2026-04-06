@@ -22,7 +22,7 @@ const sanitizeObject = (obj, fields) => {
           return null;
         }
       })
-      .filter(Boolean)
+      .filter(Boolean),
   );
 };
 
@@ -34,9 +34,24 @@ export function sanitizeUser(user) {
     ["email", (u) => u.email],
     ["phone", (u) => u.phone],
     ["role", (u) => u.role],
+    ["hireDate", (u) => u.hireDate],
     ["position", (u) => u.position],
     ["jobId", (u) => u.jobId],
     ["profileImage", (u) => u.profileImage],
+  ]);
+}
+
+export function sanitizeCompany(company) {
+  return sanitizeObject(company, [
+    ["id", (c) => c._id],
+    ["name", (c) => c.name],
+    ["email", (c) => c.email],
+    ["phone", (c) => c.phone],
+    ["active", (c) => c.active],
+    ["createdBy", (c) => c.createdBy?.name],
+    ["updatedBy", (c) => c.updatedBy?.name],
+    ["createdAt", (c) => c.createdAt],
+    ["updatedAt", (c) => c.updatedAt],
   ]);
 }
 
@@ -50,7 +65,9 @@ export function sanitizeDriver(driver) {
     ["pricePerMile", (d) => d.pricePerMile],
     ["currency", (d) => d.currency],
     ["licenseNumber", (d) => d.licenseNumber],
+    ["documents", (d) => d.documents],
     ["status", (d) => d.status],
+    ["toggle", (d) => d.toggle],
     [
       "assignedTruck",
       (d) => (d.assignedTruck ? d.assignedTruck.plateNumber : undefined),
@@ -130,6 +147,10 @@ export function sanitizeLoad(load) {
     ["distanceMiles", (l) => l.distanceMiles],
     ["pricePerMile", (l) => l.pricePerMile],
     ["totalPrice", (l) => l.totalPrice],
+    ["bonus", (l) => l.bonus],
+    ["detention", (l) => l.detention],
+    ["deduction", (l) => l.deduction],
+    ["reason", (l) => l.reason],
     ["feesNumber", (l) => l.feesNumber],
     ["currency", (l) => l.currency],
     ["status", (l) => l.status],
@@ -463,6 +484,7 @@ export function sanitizeMaintenance(m) {
     ["intervalMile", (m) => m.intervalMile],
     ["remindBeforeDays", (m) => m.remindBeforeDays],
     ["remindBeforeMile", (m) => m.remindBeforeMile],
+    ["serviceCenter", (m) => m.serviceCenter?.name],
     ["createdBy", (m) => m.createdBy?.name],
     ["updatedBy", (m) => m.updatedBy?.name],
     [
@@ -484,8 +506,8 @@ export function sanitizeMaintenance(m) {
                 };
                 return Object.fromEntries(
                   Object.entries(obj).filter(
-                    ([_, v]) => v !== undefined && v !== null
-                  )
+                    ([_, v]) => v !== undefined && v !== null,
+                  ),
                 );
               })
               .filter(Boolean)
@@ -493,5 +515,25 @@ export function sanitizeMaintenance(m) {
     ],
     ["createdAt", (m) => m.createdAt],
     ["updatedAt", (m) => m.updatedAt],
+  ]);
+}
+export function sanitizeServiceCenter(sc) {
+  return sanitizeObject(sc, [
+    ["id", (sc) => sc._id],
+    ["name", (sc) => sc.name],
+    ["city", (sc) => sc.city],
+    ["state", (sc) => sc.state],
+    ["address", (sc) => sc.address],
+    ["location", (sc) => sc.location],
+    ["phone", (sc) => sc.phone],
+    ["email", (sc) => sc.email],
+    ["active", (sc) => sc.active],
+    ["availability", (sc) => sc.availability],
+    ["services", (sc) => sc.services || []],
+    ["notes", (sc) => sc.notes],
+    ["createdBy", (sc) => sc.createdBy?.name],
+    ["updatedBy", (sc) => sc.updatedBy?.name],
+    ["createdAt", (sc) => sc.createdAt],
+    ["updatedAt", (sc) => sc.updatedAt],
   ]);
 }

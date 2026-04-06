@@ -31,6 +31,12 @@ export const createDriverValidator = [
     .isIn(["available", "inactive", "busy"])
     .withMessage("Invalid status value"),
 
+  check("toggle")
+    .optional()
+    .isBoolean()
+    .withMessage("Toggle must be boolean")
+    .toBoolean(),
+
   // pricePerMile
   check("pricePerMile")
     .notEmpty()
@@ -95,6 +101,12 @@ export const updateDriverValidator = [
     .optional()
     .isIn(["available", "inactive", "busy"])
     .withMessage("Invalid status value"),
+
+  check("toggle")
+    .optional()
+    .isBoolean()
+    .withMessage("Toggle must be boolean")
+    .toBoolean(),
 
   // pricePerMile
   check("pricePerMile")

@@ -5,6 +5,7 @@ import {
   seenMessages,
 } from "../controllers/messageController.js";
 import { protect } from "../../identity/controllers/authController.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
 import {
   sendMessageValidator,
   getMessagesValidator,
@@ -13,10 +14,11 @@ import {
 
 const router = Router();
 
-router.post("/:id", protect, sendMessageValidator, sendMessage);
+router.use(protect);
+router.use(setCompany);
 
-router.get("/:id", protect, getMessagesValidator, getMessages);
-
-router.put("/seen/:id/", protect, markSeenValidator, seenMessages);
+router.post("/:id", sendMessageValidator, sendMessage);
+router.get("/:id", getMessagesValidator, getMessages);
+router.put("/seen/:id/", markSeenValidator, seenMessages);
 
 export default router;

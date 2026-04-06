@@ -52,6 +52,5 @@ export const getUserPresenceService = asyncHandler(async (userId) => {
   const presence = await Presence.findOne({ userId }).lean();
   if (!presence) return { online: false, lastSeen: null };
 
-  await logger.info("Fetched user presence", { userId });
   return presence;
 });

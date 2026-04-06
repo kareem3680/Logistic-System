@@ -16,36 +16,38 @@ import {
   protect,
   allowedTo,
 } from "../../identity/controllers/authController.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
 import { uploadPDFs } from "../../../middlewares/uploadMiddleware.js";
+
+// Protect all routes
+router.use(protect);
+router.use(setCompany);
 
 router
   .route("/")
-  .get(protect, allowedTo("admin", "employee"), getAllLoads)
+  .get(allowedTo("admin", "employee"), getAllLoads)
   .post(
-    protect,
     allowedTo("admin", "employee"),
     uploadPDFs,
     createLoadValidator,
-    createLoad
+    createLoad,
   );
 
 router
   .route("/status/:id")
   .patch(
-    protect,
     allowedTo("admin", "employee"),
     updateLoadStatusValidator,
-    updateLoadStatus
+    updateLoadStatus,
   );
 
 router
   .route("/update/:id")
   .patch(
-    protect,
     allowedTo("admin", "employee"),
     uploadPDFs,
     updateLoadValidator,
-    updateLoadController
+    updateLoadController,
   );
 
 export default router;

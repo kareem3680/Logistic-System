@@ -1,6 +1,7 @@
 import cron from "node-cron";
 import { cleanOldLogs } from "./loggerService.js";
 import { checkAndNotifyMaintenancesCron } from "../modules/maintenance/services/maintenanceService.js";
+import { checkAndNotifyTimeOffsCron } from "../modules/driverDashboard/services/timeOffService.js";
 
 cron.schedule("0 16 * * 1", () => {
   console.log("🧹 Daily log cleanup started (Every Monday at 4 PM)");
@@ -17,6 +18,7 @@ cron.schedule("0 10 * * *", async () => {
   );
   try {
     await checkAndNotifyMaintenancesCron();
+    await checkAndNotifyTimeOffsCron();
   } catch (error) {
     console.error("🔴 Cron job failed", error);
   }

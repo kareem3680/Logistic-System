@@ -24,6 +24,7 @@ const notificationSchema = new Schema(
         "identity",
         "maintenance",
         "chat",
+        "service-center",
       ],
       default: "system",
     },
@@ -48,8 +49,14 @@ const notificationSchema = new Schema(
       enum: ["unread", "read"],
       default: "unread",
     },
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+      index: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const notificationModel = model("Notification", notificationSchema);

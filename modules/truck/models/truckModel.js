@@ -4,6 +4,13 @@ const AutoIncrement = pkg(mongoose);
 
 const truckSchema = new Schema(
   {
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+      index: true,
+    },
+
     plateNumber: {
       type: String,
       required: [true, "Truck plate number is required"],
@@ -75,7 +82,7 @@ const truckSchema = new Schema(
       ref: "User",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 truckSchema.plugin(AutoIncrement, { inc_field: "truckId", start_seq: 1000 });

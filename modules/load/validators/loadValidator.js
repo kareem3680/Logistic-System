@@ -112,6 +112,20 @@ export const createLoadValidator = [
     .isFloat({ min: 0.01 })
     .withMessage("totalPrice must be greater than 0"),
 
+  check("bonus").optional().isNumeric().withMessage("bonus must be a number"),
+
+  check("detention")
+    .optional()
+    .isNumeric()
+    .withMessage("detention must be a number"),
+
+  check("deduction")
+    .optional()
+    .isNumeric()
+    .withMessage("deduction must be a number"),
+
+  check("reason").optional().isString().withMessage("reason must be a string"),
+
   check("currency")
     .optional()
     .isIn(["USD", "EUR", "EGP", "GBP", "SAR"])
@@ -190,6 +204,20 @@ export const updateLoadValidator = [
     .optional()
     .isISO8601()
     .withMessage("cancelledAt must be a valid date"),
+
+  check("bonus").optional().isNumeric().withMessage("bonus must be a number"),
+
+  check("detention")
+    .optional()
+    .isNumeric()
+    .withMessage("detention must be a number"),
+
+  check("deduction")
+    .optional()
+    .isNumeric()
+    .withMessage("deduction must be a number"),
+
+  check("reason").optional().isString().withMessage("reason must be a string"),
 
   check("documents")
     .optional()

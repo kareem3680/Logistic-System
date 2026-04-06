@@ -1,0 +1,4311 @@
+{
+  "info": {
+    "_postman_id": "eec8c5f6-3a11-4ded-b7c5-d7c454946077",
+    "name": "Styles Dispatch Managment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48758854",
+    "_collection_link": "https://go.postman.co/collection/48758854-eec8c5f6-3a11-4ded-b7c5-d7c454946077?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Identity",
+      "item": [
+        {
+          "name": "signUp",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "let token = response.token;\r",
+                  "pm.environment.set(\"JWT\", token)"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Admin\",\r\n    \"email\": \"admin@test.com\",\r\n    \"phone\": \"+201545800540\",\r\n    \"password\": \"admin000\",\r\n    \"passwordConfirmation\": \"admin000\",\r\n    \"position\": \"CEO\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/auth/signUp",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "signUp"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "logIn",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "let token = response.token;\r",
+                  "pm.environment.set(\"JWT\", token)"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"super@test.com\",\r\n    \"password\": \"super000\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/auth/logIn",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logIn"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getMyData",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/userDashboard/getMyData",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "userDashboard",
+                "getMyData"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateMyData",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Ahmed Ali\",\r\n    \"email\": \"ahmed.ali000@example.com\",\r\n    \"phone\": \"+201234567890\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/userDashboard/updateMyData",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "userDashboard",
+                "updateMyData"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "changeMyPassword",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "let token = response.token;\r",
+                  "pm.environment.set(\"JWT\", token)"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"currentPassword\":\"\",\r\n    \"newPassword\":\"\",\r\n    \"newPasswordConfirm\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/updatePassword/",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "updatePassword",
+                ""
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "forgetPassword",
+      "item": [
+        {
+          "name": "sendResetCode",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/forgetPassword/sendResetCode",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "forgetPassword",
+                "sendResetCode"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "resendResetCode",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/forgetPassword/resendResetCode",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "forgetPassword",
+                "resendResetCode"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "verifyResetCode",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"resetCode\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/forgetPassword/verifyResetCode",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "forgetPassword",
+                "verifyResetCode"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "resetPassword",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let response = pm.response.json();\r",
+                  "let token = response.token;\r",
+                  "pm.environment.set(\"JWT\", token)"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\" : \"\",\r\n    \"newPassword\": \"\",\r\n    \"confirmNewPassword\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/forgetPassword/resetPassword",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "forgetPassword",
+                "resetPassword"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "UI Settings",
+      "item": [
+        {
+          "name": "Palette",
+          "item": [
+            {
+              "name": "getAllPalette",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{MainHost}}/api/v1/ui-settings/palette",
+                  "host": [
+                    "{{MainHost}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ui-settings",
+                    "palette"
+                  ],
+                  "query": [
+                    {
+                      "key": "sort",
+                      "value": "-createdAt",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sort",
+                      "value": "createdAt",
+                      "disabled": true
+                    },
+                    {
+                      "key": "fields",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "from",
+                      "value": "2025-11-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "to",
+                      "value": "2025-12-01",
+                      "disabled": true
+                    },
+                    {
+                      "key": "createdAt[lte]",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "createdAt[gte]",
+                      "value": "",
+                      "disabled": true
+                    },
+                    {
+                      "key": "keyword",
+                      "value": "john",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "disabled": true
+                    },
+                    {
+                      "key": "active",
+                      "value": "true",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "getSpecificPalette",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{MainHost}}/api/v1/ui-settings/palette/6914ccaef64c95d87053bb0e",
+                  "host": [
+                    "{{MainHost}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ui-settings",
+                    "palette",
+                    "6914ccaef64c95d87053bb0e"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "createPalette",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"mode\": \"lighddt\",\n    \"active\":\"true\",\n    \"background\": {\n        \"default\": \"#1E56A0\",\n        \"paper\": \"#FBFDFE\"\n    },\n    \"primary\": {\n        \"main\": \"#54a843\",\n        \"contrastText\": \"#FBFDFE\"\n    },\n    \"secondary\": {\n        \"main\": \"#266DCB\",\n        \"contrastText\": \"#F6F6F6\"\n    },\n    \"text\": {\n        \"primary\": \"#333\",\n        \"secondary\": \"#FBFDFE\"\n    }\n}"
+                },
+                "url": {
+                  "raw": "{{MainHost}}/api/v1/ui-settings/palette",
+                  "host": [
+                    "{{MainHost}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ui-settings",
+                    "palette"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "updatePalette",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"active\": \"true\"\n}"
+                },
+                "url": {
+                  "raw": "{{MainHost}}/api/v1/ui-settings/palette/691c7d1a2a8d3fa5cef275dc",
+                  "host": [
+                    "{{MainHost}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ui-settings",
+                    "palette",
+                    "691c7d1a2a8d3fa5cef275dc"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "deletePalette",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{JWT}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"mode\": \"dark\",\n  \"background\": {\n    \"default\": \"#0D1B2A\",\n    \"paper\": \"#1B263B\"\n  },\n  \"primary\": {\n    \"main\": \"#415A77\",\n    \"contrastText\": \"#E0E1DD\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{MainHost}}/api/v1/ui-settings/palette/691481f3f50c8cae29e2cbdd",
+                  "host": [
+                    "{{MainHost}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "ui-settings",
+                    "palette",
+                    "691481f3f50c8cae29e2cbdd"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "CreateOrGetConversation",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"userId\": \"698f75b2e1102e44451a1aa5\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/chat/conversations/start",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat",
+                "conversations",
+                "start"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GetUserConversations",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/chat/conversations",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat",
+                "conversations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "addMessage",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"text\",\n    \"content\": {\n        \"text\": \"Hello world!\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/chat/messages/694a89f51e1059c7cf5736e9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat",
+                "messages",
+                "694a89f51e1059c7cf5736e9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getConversationMessages",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/chat/messages/692dbe84052701023aa03c5e",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat",
+                "messages",
+                "692dbe84052701023aa03c5e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "markMessagesSeen",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/chat/messages/seen/692dc77a1f8744e2331ff717",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chat",
+                "messages",
+                "seen",
+                "692dc77a1f8744e2331ff717"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "adminDashboard",
+      "item": [
+        {
+          "name": "createUser",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Styles Dispatcher\",\r\n    \"email\": \"styles_dispatcher@test.com\",\r\n    \"phone\": \"+201545800540\",\r\n    \"password\": \"styles000\",\r\n    \"passwordConfirmation\": \"styles000\",\r\n    \"position\": \"Dispatcher\",\r\n    \"role\": \"employee\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/adminDashboard",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "adminDashboard"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllUsers",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/adminDashboard",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "adminDashboard"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-jobId",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "jobId",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "name phone",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "jobId[lte]",
+                  "value": "200",
+                  "disabled": true
+                },
+                {
+                  "key": "jobId[gte]",
+                  "value": "120",
+                  "disabled": true
+                },
+                {
+                  "key": "active",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "Flutter",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSpecificUser",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/adminDashboard/682cd24209b3cd29954d763e",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "adminDashboard",
+                "682cd24209b3cd29954d763e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateUserRole",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"role\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/adminDashboard/6787816668730d28fe99332f",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "adminDashboard",
+                "6787816668730d28fe99332f"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deactivateUser",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/adminDashboard/deactivate/68d54eb71a883f6b507a26e0",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "adminDashboard",
+                "deactivate",
+                "68d54eb71a883f6b507a26e0"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "activateUser",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/adminDashboard/activate/68d54eb71a883f6b507a26e0",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "adminDashboard",
+                "activate",
+                "68d54eb71a883f6b507a26e0"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Companies",
+      "item": [
+        {
+          "name": "createCompany",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Styles\",\n    \"email\": \"styles@gmail.com\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/companies",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "companies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllCompanies",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/companies",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "companies"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "location",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "active",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "Boulevard",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateCompany",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Eastern Service Hub\",\n    \"city\": \"Dammam\",\n    \"state\": \"Eastern Province\",\n    \"location\": {\n        \"type\": \"Point\",\n        \"coordinates\": [\n            50.0987654,\n            26.4204716\n        ]\n    },\n    \"phone\": \"0138223344\",\n    \"active\": false,\n    \"availability\": \"Daily 8 AM - 6 PM\",\n    \"services\": [\n        \"Quick Check\",\n        \"Oil Change\"\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/companies/69834c49d18ed3611172159a",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "companies",
+                "69834c49d18ed3611172159a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSingleCompany",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/companies69834c49d18ed3611172159a",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "companies69834c49d18ed3611172159a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deactivateCompany",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/companies/deactivate/698617095bf13d28d7585b35",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "companies",
+                "deactivate",
+                "698617095bf13d28d7585b35"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "activateCompany",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/companies/activated/698617095bf13d28d7585b35",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "companies",
+                "activated",
+                "698617095bf13d28d7585b35"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "item": [
+        {
+          "name": "createMaintenance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"Oil Change\",\n    \"repeatBy\": \"mile\",\n    \"intervalMile\": 5000,\n    \"remindBeforeMile\": 500,\n    \"serviceCenter\": \"69834c06b9584635f0ca3683\",\n    \"statusPerTruck\": [\n        {\n            \"truck\": \"691cd7a5ad9929e6f68403a0\",\n            \"lastDoneMile\": 300\n        },\n        {\n            \"truck\": \"691cd7c8ad9929e6f68403ae\",\n            \"lastDoneMile\": 200\n        },\n        {\n            \"truck\": \"691dc25a70481156e84ac1da\",\n            \"lastDoneMile\": 100\n        }\n    ]\n}\n// {\n//     \"type\": \"Oil Change\",\n//     \"repeatBy\": \"time\",\n//     \"intervalDays\": 500,\n//     \"remindBeforeDays\": 5,\n//     \"statusPerTruck\": [\n//         {\n//             \"truck\": \"691cd7a5ad9929e6f68403a0\",\n//             \"lastDoneAt\": \"2025-11-10\"\n//         },\n//         {\n//             \"truck\": \"691cd7c8ad9929e6f68403ae\",\n//             \"lastDoneAt\": \"2025-12-02\"\n//         },\n//         {\n//             \"truck\": \"691dc25a70481156e84ac1da\",\n//             \"lastDoneAt\": \"2025-07-08\"\n//         }\n//     ]\n// }"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/maintenances",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "maintenances"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllMaintenances",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/maintenances",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "maintenances"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateMaintenance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"Oil Change\",\n    \"repeatBy\": \"mile\",\n    \"intervalMile\": 5000,\n    \"remindBeforeMile\": 500,\n    \"statusPerTruck\": [\n        {\n            \"truck\": \"691cd7a5ad9929e6f68403a0\",\n            \"lastDoneMile\": 300\n        },\n        {\n            \"truck\": \"691cd7c8ad9929e6f68403ae\",\n            \"lastDoneMile\": 200\n        },\n        {\n            \"truck\": \"691dc25a70481156e84ac1da\",\n            \"lastDoneMile\": 100\n        }\n    ]\n}\n// {\n//     \"type\": \"Oil Change\",\n//     \"repeatBy\": \"time\",\n//     \"intervalDays\": 500,\n//     \"remindBeforeDays\": 5,\n//     \"statusPerTruck\": [\n//         {\n//             \"truck\": \"691cd7a5ad9929e6f68403a0\",\n//             \"lastDoneAt\": \"2025-11-10\"\n//         },\n//         {\n//             \"truck\": \"691cd7c8ad9929e6f68403ae\",\n//             \"lastDoneAt\": \"2025-12-02\"\n//         },\n//         {\n//             \"truck\": \"691dc25a70481156e84ac1da\",\n//             \"lastDoneAt\": \"2025-07-08\"\n//         }\n//     ]\n// }"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/maintenances/693092fac870de8eba64ea39",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "maintenances",
+                "693092fac870de8eba64ea39"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSingleMaintenance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/maintenances/69317ef56d1e88e50e94493e",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "maintenances",
+                "69317ef56d1e88e50e94493e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteMaintenance",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/maintenances/69317ef56d1e88e50e94493e",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "maintenances",
+                "69317ef56d1e88e50e94493e"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "serviceCenters",
+      "item": [
+        {
+          "name": "createServiceCenter",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Northern Service Center\",\n    \"city\": \"Riyadh\",\n    \"state\": \"Riyadh Region\",\n    \"address\": \"Al Olaya District, Al Urubah Street, Building 45\",\n    \"location\": {\n        \"type\": \"Point\",\n        \"coordinates\": [\n            46.6752957,\n            24.7135517\n        ]\n    },\n    \"phone\": \"+966112345678\",\n    \"email\": \"northern.center@example.com\",\n    \"active\": true,\n    \"availability\": \"Sat-Wed: 7:30 AM - 5:30 PM | Thu: 8 AM - 2 PM | Fri: Closed\",\n    \"services\": [\n        \"General Maintenance\",\n        \"Oil Change\",\n        \"Brake Inspection\",\n        \"Engine Service\",\n        \"Tire Services\",\n        \"Battery Replacement\"\n    ],\n    \"notes\": \"Free parking available - 24/7 customer support\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/service-centers",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "service-centers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllServiceCenters",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/service-centers",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "service-centers"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "location",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "active",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "Boulevard",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateServiceCenter",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Eastern Service Hub\",\n    \"city\": \"Dammam\",\n    \"state\": \"Eastern Province\",\n    \"location\": {\n        \"type\": \"Point\",\n        \"coordinates\": [\n            50.0987654,\n            26.4204716\n        ]\n    },\n    \"phone\": \"0138223344\",\n    \"active\": false,\n    \"availability\": \"Daily 8 AM - 6 PM\",\n    \"services\": [\n        \"Quick Check\",\n        \"Oil Change\"\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/service-centers/69834c49d18ed3611172159a",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "service-centers",
+                "69834c49d18ed3611172159a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSingleServiceCenter",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/service-centers/69834c49d18ed3611172159a",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "service-centers",
+                "69834c49d18ed3611172159a"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteServiceCenter",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/service-centers/69834c49d18ed3611172159a",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "service-centers",
+                "69834c49d18ed3611172159a"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "driverDashboard",
+      "item": [
+        {
+          "name": "getAllDriverLoads",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/driver-load",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "driver-load"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "origin destination",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[lte]",
+                  "value": "0.4",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "delivered",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "Boulevard",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "addComment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/comments/:loadId",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "comments",
+                ":loadId"
+              ],
+              "variable": [
+                {
+                  "key": "loadId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "saveFcmToken",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcmToken\": \"xxxxxxxxxxxxxxxxxxxx\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/save-fcm-token",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "save-fcm-token"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "addPDFs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documentsForDriver",
+                  "type": "file",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/driver-load/add-documents/:loadId",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "driver-load",
+                "add-documents",
+                ":loadId"
+              ],
+              "variable": [
+                {
+                  "key": "loadId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getDriverPayCheck",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/pay-check/",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "pay-check",
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createTimeOff",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"from\": \"2025-12-01\",\n    \"to\": \"2025-12-03\",\n    \"reason\": \"Personal\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/time-off",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "time-off"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getMyTimeOff",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/my",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "time-off",
+                "my"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-driverId",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "driverId",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "name phone",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[lte]",
+                  "value": "0.4",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "busy",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "john",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "cancelMyTimeOff",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/cancel/692876973d5c075358dc8f32",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "time-off",
+                "cancel",
+                "692876973d5c075358dc8f32"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateLoadAppointment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"arrivalAtReceiver\": \"2025-10-15T12:45:00Z\",\r\n    \"arrivalAtShipper\": \"2025-10-15T12:45:00Z\",\r\n    \"leftReceiver\": \"2025-10-15T12:45:00Z\",\r\n    \"leftShipper\": \"2025-10-15T12:45:00Z\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/driver-load/update-appointment/6953c8f8b676e17ccc3ee1cc",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "driver-load",
+                "update-appointment",
+                "6953c8f8b676e17ccc3ee1cc"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Job-Application",
+      "item": [
+        {
+          "name": "createJobApplication",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"fullName\": \"Ahmed Mahmoud\",\r\n    \"email\": \"kareem3680@gmail.com\",\r\n    \"phone\": \"+201112223334\",\r\n    \"jobTitle\": \"Backend Developer\",\r\n    \"location\": \"Cairo, Egypt\",\r\n    \"experienceYears\": 3,\r\n    \"skills\": [\r\n        \"Node.js\",\r\n        \"Express\",\r\n        \"MongoDB\",\r\n        \"Docker\"\r\n    ],\r\n    \"cvLink\": \"https://drive.google.com/file/d/1IEYlb_9zbBFhswhX9appTcrQ88eRslBm/view?usp=drivesdk\",\r\n    \"notes\": \"Looking forward to joining your tech team and making APIs great again!\"\r\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/job-applications",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "job-applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateJobApplicationStatus",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/job-applications/status/68e66346ff2620cc4895ed59",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "job-applications",
+                "status",
+                "68e66346ff2620cc4895ed59"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllJobApplication",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/job-applications",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "job-applications"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-createdAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "fullName phone",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "experienceYears[lte]",
+                  "value": "2",
+                  "disabled": true
+                },
+                {
+                  "key": "experienceYears[gte]",
+                  "value": "3",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "Cairo",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "getAllCustomers",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/customers",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "customers"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-customerId",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "customerId",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "name phone",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "customerId[lte]",
+                  "value": "1200",
+                  "disabled": true
+                },
+                {
+                  "key": "customerId[gte]",
+                  "value": "1400",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "shipper",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "arkansas",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createCustomer",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"kareem\",\n    \"email\": \"\",\n    \"phone\": \"\",\n    \"address\": \"\",\n    \"type\": \"\",\n    \"feedback\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/customers",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "customers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSpecificCustomer",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/customers/68dbea48878ed201b4f5cfc9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "customers",
+                "68dbea48878ed201b4f5cfc9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateCustomer",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"\",\n    \"email\": \"\",\n    \"phone\": \"\",\n    \"address\": \"\",\n    \"type\": \"\",\n    \"feedback\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/customers/68dbf34112994d43d63c47bc",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "customers",
+                "68dbf34112994d43d63c47bc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteCustomer",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/customers/68dbea48878ed201b4f5cfc9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "customers",
+                "68dbea48878ed201b4f5cfc9"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "createNotification (DB only)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test Notification\",\n    \"message\": \"Hello from Postman\",\n    \"module\": \"system\",\n    \"importance\": \"low\",\n    \"toRole\": [\"admin\"]\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/notifications",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "sendNotification",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"title\": \"Test Notification\",\n    \"message\": \"Hello from Postman\",\n    \"module\": \"system\",\n    \"importance\": \"low\",\n    \"toRole\": [\"admin\"]\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/notifications/send",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "send"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllNotifications",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/notifications",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-createdAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "message module",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "unread",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "United States",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "markAllAsRead",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/notifications/mark-all",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "mark-all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "markSpecificAsRead",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/notifications/mark/68a19daf512f4d7dfbb410e1",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "notifications",
+                "mark",
+                "68a19daf512f4d7dfbb410e1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "addSetting",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"key\": \"repairPerMile\",\r\n    \"value\": 0.05\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/settings",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSettings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/settings",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-value",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "value ",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "key value",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "value[lte]",
+                  "value": "0.4",
+                  "disabled": true
+                },
+                {
+                  "key": "value[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "insurance",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateSettings",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"value\": 0.17\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/settings/68eea133b7c68428ba424c2e",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "settings",
+                "68eea133b7c68428ba424c2e"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Driver",
+      "item": [
+        {
+          "name": "getAllDrivers",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/drivers",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drivers"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-driverId",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "driverId",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "name phone",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[lte]",
+                  "value": "0.4",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "busy",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "john",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createDriver",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"driver\",\n    \"email\": \"driver@example.com\",\n    \"phone\": \"+201234567890\",\n    \"licenseNumber\": \"LIC-000\",\n    \"pricePerMile\": 0.25,\n    \"toggle\": true,\n    \"user\": \"6903a2f59cef73e96e738738\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/drivers",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drivers"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSpecificDriver",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/drivers/68dbea48878ed201b4f5cfc9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drivers",
+                "68dbea48878ed201b4f5cfc9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateDriver",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "uuid": "4075d011-282c-4846-b103-df57c7bf175c",
+                  "src": "/C:/Users/Pc/Downloads/Annotation 2025-101-06 193736.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/drivers/6981fa8565e2a6690cbbff95",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drivers",
+                "6981fa8565e2a6690cbbff95"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteDriver",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/drivers/68dbea48878ed201b4f5cfc9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "drivers",
+                "68dbea48878ed201b4f5cfc9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllTimeOffs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/all",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "time-off",
+                "all"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-driverId",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "driverId",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "name phone",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[lte]",
+                  "value": "0.4",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "busy",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "john",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateTimeOffStatus",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\",\n  \"adminNote\": \"NO NO NO NO NO NO NO\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/driver-dashboard/time-off/status/6928874138d1fbf66ba7c155",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "driver-dashboard",
+                "time-off",
+                "status",
+                "6928874138d1fbf66ba7c155"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Truck",
+      "item": [
+        {
+          "name": "getAllTrucks",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/trucks",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-truckId",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "truckId",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "plateNumber model",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "fuelPerMile[lte]",
+                  "value": "0.4",
+                  "disabled": true
+                },
+                {
+                  "key": "fuelPerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "reefer",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "0124",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "createTruck",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"plateNumber\": \"ABC-1234\",\n    \"model\": \"Volvo FH16\",\n    \"capacity\": 25000,\n    \"year\": 2010,\n    \"type\": \"reefer\",\n    \"source\": \"company\",\n    \"fuelPerMile\": 0.20,\n    \"totalMileage\": 50000\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/trucks",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getSpecificTruck",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/trucks/68dc15a70b173ad8ccd772d9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks",
+                "68dc15a70b173ad8ccd772d9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateTruck",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahmed H. Ali\",\n  \"licenseNumber\": \"LIC-54321\",\n  \"phone\": \"+201002223344\",\n  \"email\": \"ahmed.h.ali@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/trucks/68dc15a70b173ad8ccd772d9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks",
+                "68dc15a70b173ad8ccd772d9"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteTruck",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/trucks/68dc15a70b173ad8ccd772d9",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "trucks",
+                "68dc15a70b173ad8ccd772d9"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Load",
+      "item": [
+        {
+          "name": "createLoad",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "origin[address]",
+                  "value": "Edmonton",
+                  "type": "text"
+                },
+                {
+                  "key": "destination[0][address]",
+                  "value": "Winnipeg",
+                  "type": "text"
+                },
+                {
+                  "key": "destination[1][address]",
+                  "value": "Winnipeg",
+                  "type": "text"
+                },
+                {
+                  "key": "destination[2][address]",
+                  "value": "Winnipeg",
+                  "type": "text"
+                },
+                {
+                  "key": "DHO[address]",
+                  "value": "Saskatoon",
+                  "type": "text"
+                },
+                {
+                  "key": "pickupAt",
+                  "value": "2025-10-09T08:00:00.000Z",
+                  "type": "text"
+                },
+                {
+                  "key": "completedAt",
+                  "value": "2025-10-09T08:00:00.000Z",
+                  "type": "text"
+                },
+                {
+                  "key": "loadId",
+                  "value": "Q-30000",
+                  "type": "text"
+                },
+                {
+                  "key": "driverId",
+                  "value": "69528e3ce6bdc59b66794e42",
+                  "type": "text"
+                },
+                {
+                  "key": "truckId",
+                  "value": "6953c5dd13fce914fe2aeed7",
+                  "type": "text"
+                },
+                {
+                  "key": "truckType",
+                  "value": "reefer",
+                  "type": "text"
+                },
+                {
+                  "key": "truckTemp",
+                  "value": "-10",
+                  "type": "text"
+                },
+                {
+                  "key": "distanceMiles",
+                  "value": "350",
+                  "type": "text"
+                },
+                {
+                  "key": "pricePerMile",
+                  "value": "50",
+                  "type": "text"
+                },
+                {
+                  "key": "totalPrice",
+                  "value": "7500",
+                  "type": "text"
+                },
+                {
+                  "key": "feesNumber",
+                  "value": "115",
+                  "type": "text"
+                },
+                {
+                  "key": "currency",
+                  "value": "USD",
+                  "type": "text"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": "/C:/Users/Pc/Downloads/Styles Trucking Services – SaaS Backend Overview.pdf"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/loads",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "loads"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateLoadStatus",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"delivered\",\n  \"deliveredAt\": \"2025-12-30T16:21:12.750+00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/loads/status/6953c8f8b676e17ccc3ee1cc",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "loads",
+                "status",
+                "6953c8f8b676e17ccc3ee1cc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateLoad",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "arrivalAtShipper",
+                  "value": "2025-10-15T12:45:00Z",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "arrivalAtReceiver",
+                  "value": "2025-10-15T12:45:00Z",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "leftShipper",
+                  "value": "2025-10-15T12:45:00Z",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "leftReceiver",
+                  "value": "2025-10-15T12:45:00Z",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "bonus",
+                  "value": "100",
+                  "type": "text",
+                  "uuid": "cdc57830-7f48-4fe3-a338-e9d640cb30dd"
+                },
+                {
+                  "key": "detention",
+                  "value": "50",
+                  "type": "text",
+                  "uuid": "11380186-8549-414b-895e-3b274307a465"
+                },
+                {
+                  "key": "deduction",
+                  "value": "100",
+                  "type": "text",
+                  "uuid": "3bd73b89-ce6d-4b9a-99d7-9f4f554156bd"
+                },
+                {
+                  "key": "reason",
+                  "value": "good",
+                  "type": "text",
+                  "uuid": "35da6d15-38ad-4670-b0c0-45189b4fd48c"
+                },
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": "/C:/Users/Pc/Downloads/Styles Trucking SaaS Backend - Summary.pdf",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/loads/update/6953c8f8b676e17ccc3ee1cc",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "loads",
+                "update",
+                "6953c8f8b676e17ccc3ee1cc"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getAllLoads",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/loads",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "loads"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "completedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "origin destination",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[lte]",
+                  "value": "0.4",
+                  "disabled": true
+                },
+                {
+                  "key": "pricePerMile[gte]",
+                  "value": "0.1",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "delivered",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "Boulevard",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "getCommentsforLoad",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/comments/loadId",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "comments",
+                "loadId"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-createdAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "createdAt",
+                  "disabled": true
+                },
+                {
+                  "key": "fields",
+                  "value": "type",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2025-11-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-01",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "Boulevard",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "addComment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Dispatcher note: driver delayed due to traffic.\",\n  \"type\": \"dispatcher\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/comments/:loadId",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "comments",
+                ":loadId"
+              ],
+              "variable": [
+                {
+                  "key": "loadId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "updateComment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"text\": \"Updated note: driver arrived safely at 3 PM.\",\n    \"type\":\"driver\"\n}"
+            },
+            "url": {
+              "raw": "{{MainHost}}/api/v1/comments/:loadId/:commentId",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "comments",
+                ":loadId",
+                ":commentId"
+              ],
+              "variable": [
+                {
+                  "key": "loadId",
+                  "value": ""
+                },
+                {
+                  "key": "commentId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "deleteComment",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/comments/:loadId/:commentId",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "comments",
+                ":loadId",
+                ":commentId"
+              ],
+              "variable": [
+                {
+                  "key": "loadId",
+                  "value": ""
+                },
+                {
+                  "key": "commentId",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Summary",
+      "item": [
+        {
+          "name": "getAllTrucksLoadSummary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/summary/truck",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "summary",
+                "truck"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-09-20",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-10-02",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getTruckLoadSummary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/summary/truck/68ef89b4c501b4284911d2a0",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "summary",
+                "truck",
+                "68ef89b4c501b4284911d2a0"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-09-20",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-10-02",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "getDriverLoadSummary",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{JWT}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{MainHost}}/api/v1/summary/driver/69528e3ce6bdc59b66794e42",
+              "host": [
+                "{{MainHost}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "summary",
+                "driver",
+                "69528e3ce6bdc59b66794e42"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-09-20",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-10-02",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

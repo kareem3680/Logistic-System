@@ -37,6 +37,12 @@ export async function socketAuthMiddleware(socket, next) {
       return next(new Error(ERROR_MESSAGES.AUTH_FAILED));
     }
 
+    // Check companyId in token
+    if (!user.companyId && user.role !== "super-admin") {
+      logger.info(`User without companyId attempted connection: ${user._id}`);
+      return next(new Error(ERROR_MESSAGES.AUTH_FAILED));
+    }
+
     // Additional user validation
     if (user.isBanned) {
       logger.info(`Banned user attempted connection: ${user._id}`);

@@ -20,49 +20,35 @@ import {
   protect,
   allowedTo,
 } from "../../identity/controllers/authController.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
+
+// Protect all routes
+router.use(protect);
+router.use(setCompany);
 
 // Driver submits time off request
-router.post(
-  "/",
-  protect,
-  allowedTo("driver"),
-  createTimeOffValidator,
-  createTimeOff
-);
+router.post("/", allowedTo("driver"), createTimeOffValidator, createTimeOff);
 
 // Driver views own time off requests
-router.get(
-  "/my",
-  protect,
-  allowedTo("driver"),
-  getAllTimeOffValidator,
-  getMyTimeOff
-);
+router.get("/my", allowedTo("driver"), getAllTimeOffValidator, getMyTimeOff);
 
 // Driver cancel own time off requests
 router.patch(
   "/cancel/:id",
-  protect,
   allowedTo("driver"),
   cancelTimeOffValidator,
-  cancelTimeOff
+  cancelTimeOff,
 );
+
 // Admin views all time off requests
-router.get(
-  "/all",
-  protect,
-  allowedTo("admin"),
-  getAllTimeOffValidator,
-  getAllTimeOff
-);
+router.get("/all", allowedTo("admin"), getAllTimeOffValidator, getAllTimeOff);
 
 // Admin approves/rejects a request
 router.patch(
   "/status/:id",
-  protect,
   allowedTo("admin"),
   updateTimeOffStatusValidator,
-  updateTimeOffStatus
+  updateTimeOffStatus,
 );
 
 export default router;

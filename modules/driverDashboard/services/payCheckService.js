@@ -42,7 +42,7 @@ const getDriverWeekPeriod = (inputDate = null) => {
 
   const format = (d) =>
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-      d.getDate()
+      d.getDate(),
     ).padStart(2, "0")}`;
 
   return { from: format(lastFriday), to: format(nextThursday) };
@@ -55,7 +55,7 @@ const buildDayRange = (dateString) => {
   return { $gte: start, $lte: end };
 };
 
-//                SERVICE (no logic changed AT ALL)
+//                SERVICE
 export const getDriverPaycheckService = asyncHandler(async (req) => {
   const driver = await driverModel.findOne({ user: req.user.id }).populate({
     path: "assignedTruck",
@@ -67,7 +67,6 @@ export const getDriverPaycheckService = asyncHandler(async (req) => {
 
   const { from: lastFriday, to: nextThursday } = getDriverWeekPeriod();
 
-  // *** ONLY updated here: convert date-only → real date range ***
   const loads = await loadModel.find({
     driverId: driver._id,
     status: "delivered",
@@ -78,16 +77,41 @@ export const getDriverPaycheckService = asyncHandler(async (req) => {
   });
 
   const totalLoads = loads.length;
-  const totalMiles = loads.reduce((sum, l) => sum + (l.distanceMiles || 0), 0);
-  const pricePerMile = driver.pricePerMile || 0;
-  const totalEarnings = Number((totalMiles * pricePerMile).toFixed(2));
 
-  const detailedLoads = loads.map((l) => ({
-    origin: l.origin,
-    destination: l.destination,
-    totalMiles: l.distanceMiles || 0,
-    price: Number(((l.distanceMiles || 0) * pricePerMile).toFixed(2)),
-  }));
+  const totalMiles = loads.reduce((sum, l) => sum + (l.distanceMiles || 0), 0);
+
+  // factor used everywhere
+  const milesFactor = driver.toggle ? 0.85 : 1;
+
+  const effectiveMiles = Number((totalMiles * milesFactor).toFixed(2));
+
+  const totalBonus = loads.reduce((sum, l) => sum + (l.bonus || 0), 0);
+  const totalDetention = loads.reduce((sum, l) => sum + (l.detention || 0), 0);
+  const totalDeduction = loads.reduce((sum, l) => sum + (l.deduction || 0), 0);
+
+  const pricePerMile = driver.pricePerMile || 0;
+  const baseEarnings = Number((effectiveMiles * pricePerMile).toFixed(2));
+
+  const totalEarnings = Number(
+    (baseEarnings + totalBonus + totalDetention - totalDeduction).toFixed(2),
+  );
+
+  const detailedLoads = loads.map((l) => {
+    const adjustedMiles = Number(
+      ((l.distanceMiles || 0) * milesFactor).toFixed(2),
+    );
+
+    return {
+      origin: l.origin,
+      destination: l.destination,
+      totalMiles: adjustedMiles,
+      price: Number((adjustedMiles * pricePerMile).toFixed(2)),
+      bonus: l.bonus,
+      detention: l.detention,
+      deduction: l.deduction,
+      reason: l.reason,
+    };
+  });
 
   await logger.info(`Paycheck | Driver: ${driver._id} | Loads: ${totalLoads}`);
 
@@ -96,13 +120,19 @@ export const getDriverPaycheckService = asyncHandler(async (req) => {
     assignedTruck: driver.assignedTruck,
     rate: `${driver.pricePerMile}$`,
     totalLoads,
-    totalMiles,
-    totalEarnings,
+    totalMiles: effectiveMiles,
     pricePerMile,
     currency: driver.currency || "USD",
     period: {
       from: lastFriday,
       to: nextThursday,
+    },
+    earnings: {
+      baseEarnings,
+      totalBonus,
+      totalDetention,
+      totalDeduction,
+      totalEarnings,
     },
     loads: detailedLoads,
   };

@@ -8,7 +8,11 @@ import {
 } from "../services/customerService.js";
 
 export const getCustomers = asyncHandler(async (req, res) => {
-  const customers = await getAllCustomersService(req);
+  const customers = await getAllCustomersService(
+    req,
+    req.companyId,
+    req.user.role,
+  );
   res.status(200).json({
     message: "Customers fetched successfully",
     stats: customers.stats,
@@ -19,7 +23,11 @@ export const getCustomers = asyncHandler(async (req, res) => {
 });
 
 export const getCustomer = asyncHandler(async (req, res) => {
-  const customer = await getCustomerByIdService(req.params.id);
+  const customer = await getCustomerByIdService(
+    req.params.id,
+    req.companyId,
+    req.user.role,
+  );
   res.status(200).json({
     message: "Customer fetched successfully",
     data: customer,
@@ -27,7 +35,12 @@ export const getCustomer = asyncHandler(async (req, res) => {
 });
 
 export const createCustomer = asyncHandler(async (req, res) => {
-  const customer = await createCustomerService(req.body, req.user._id);
+  const customer = await createCustomerService(
+    req.body,
+    req.user._id,
+    req.companyId,
+    req.user.role,
+  );
   res.status(201).json({
     message: "Customer created successfully",
     data: customer,
@@ -38,7 +51,9 @@ export const updateCustomer = asyncHandler(async (req, res) => {
   const customer = await updateCustomerService(
     req.params.id,
     req.body,
-    req.user._id
+    req.user._id,
+    req.companyId,
+    req.user.role,
   );
   res.status(200).json({
     message: "Customer updated successfully",
@@ -47,7 +62,7 @@ export const updateCustomer = asyncHandler(async (req, res) => {
 });
 
 export const deleteCustomer = asyncHandler(async (req, res) => {
-  await deleteCustomerService(req.params.id);
+  await deleteCustomerService(req.params.id, req.companyId, req.user.role);
   res.status(200).json({
     message: "Customer deleted successfully",
   });

@@ -19,16 +19,21 @@ import {
   protect,
   allowedTo,
 } from "../../identity/controllers/authController.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
+
+// Protect all routes
+router.use(protect);
+router.use(setCompany);
 
 router
   .route("/")
-  .get(protect, getPaletteValidator, getAllPalettes)
-  .post(protect, allowedTo("admin"), createPaletteValidator, createPalette);
+  .get(getAllPalettes)
+  .post(allowedTo("admin"), createPaletteValidator, createPalette);
 
 router
   .route("/:id")
-  .get(protect, getPaletteValidator, getPaletteById)
-  .patch(protect, allowedTo("admin"), updatePaletteValidator, updatePalette)
-  .delete(protect, allowedTo("admin"), deletePalette);
+  .get(getPaletteValidator, getPaletteById)
+  .patch(allowedTo("admin"), updatePaletteValidator, updatePalette)
+  .delete(allowedTo("admin"), deletePalette);
 
 export default router;

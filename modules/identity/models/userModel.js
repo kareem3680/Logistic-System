@@ -44,7 +44,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["admin", "employee", "driver"],
+      enum: ["super-admin", "admin", "employee", "driver"],
       default: "employee",
     },
     position: {
@@ -62,8 +62,15 @@ const userSchema = new Schema(
       type: [String],
       default: [],
     },
+    companyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company",
+      required: function () {
+        return this.role !== "super-admin";
+      },
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {

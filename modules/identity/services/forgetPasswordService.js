@@ -60,7 +60,7 @@ export const resendResetCodeService = asyncHandler(async (email) => {
   if (!user.passwordResetCode || !user.passwordResetCodeExpiresAt) {
     throw new ApiError(
       "🛑 You haven’t requested a reset code yet. Please request a code first.",
-      400
+      400,
     );
   }
 
@@ -69,11 +69,11 @@ export const resendResetCodeService = asyncHandler(async (email) => {
     now - user.lastResetCodeSentAt < 2 * 60 * 1000
   ) {
     const wait = Math.ceil(
-      (2 * 60 * 1000 - (now - user.lastResetCodeSentAt)) / 1000
+      (2 * 60 * 1000 - (now - user.lastResetCodeSentAt)) / 1000,
     );
     throw new ApiError(
       `⏳ Please wait ${wait} seconds before requesting a new code`,
-      429
+      429,
     );
   }
 
@@ -84,7 +84,7 @@ export const resendResetCodeService = asyncHandler(async (email) => {
   if (user.resetCodeRequests.length >= 5) {
     throw new ApiError(
       "🛑 You have reached the limit reset code requests, try again later",
-      429
+      429,
     );
   }
 
@@ -154,7 +154,7 @@ export const resetPassword = asyncHandler(async (email, newPassword) => {
   user.passwordResetCodeVerified = undefined;
   await user.save();
 
-  const token = createToken(user._id);
+  const token = createToken(user);
   await logger.info("Password reset successful", { email });
 
   return token;

@@ -8,18 +8,22 @@ import {
 } from "../services/truckService.js";
 
 export const getTrucks = asyncHandler(async (req, res) => {
-  const trucks = await getAllTrucksService(req);
+  const trucks = await getAllTrucksService(req, req.companyId, req.user.role);
   res.status(200).json({
     message: "Trucks fetched successfully",
     stats: trucks.stats,
     data: trucks.data,
-    results: trucks.length,
+    results: trucks.results,
     paginationResult: trucks.paginationResult,
   });
 });
 
 export const getTruck = asyncHandler(async (req, res) => {
-  const truck = await getTruckByIdService(req.params.id);
+  const truck = await getTruckByIdService(
+    req.params.id,
+    req.companyId,
+    req.user.role,
+  );
   res.status(200).json({
     message: "Truck fetched successfully",
     data: truck,
@@ -27,7 +31,12 @@ export const getTruck = asyncHandler(async (req, res) => {
 });
 
 export const createTruck = asyncHandler(async (req, res) => {
-  const truck = await createTruckService(req.body, req.user._id);
+  const truck = await createTruckService(
+    req.body,
+    req.user._id,
+    req.companyId,
+    req.user.role,
+  );
   res.status(201).json({
     message: "Truck created successfully",
     data: truck,
@@ -35,7 +44,13 @@ export const createTruck = asyncHandler(async (req, res) => {
 });
 
 export const updateTruck = asyncHandler(async (req, res) => {
-  const truck = await updateTruckService(req.params.id, req.body, req.user._id);
+  const truck = await updateTruckService(
+    req.params.id,
+    req.body,
+    req.user._id,
+    req.companyId,
+    req.user.role,
+  );
   res.status(200).json({
     message: "Truck updated successfully",
     data: truck,
@@ -43,9 +58,8 @@ export const updateTruck = asyncHandler(async (req, res) => {
 });
 
 export const deleteTruck = asyncHandler(async (req, res) => {
-  const truck = await deleteTruckService(req.params.id, req.user._id);
+  await deleteTruckService(req.params.id, req.companyId, req.user.role);
   res.status(200).json({
     message: "Truck deleted successfully",
-    data: truck,
   });
 });

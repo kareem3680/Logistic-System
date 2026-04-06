@@ -18,9 +18,9 @@ const fileFilter = (req, file, cb) => {
     cb(
       new ApiError(
         `🛑 Only PDF files are allowed. Invalid type: ${file.mimetype}`,
-        400
+        400,
       ),
-      false
+      false,
     );
   }
 };

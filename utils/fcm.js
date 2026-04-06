@@ -10,7 +10,28 @@ const sendFCM = asyncHandler(async (token, title, body, data = {}) => {
 
   const message = {
     token,
-    notification: { title, body },
+
+    notification: {
+      title,
+      body,
+    },
+
+    // Android config
+    android: {
+      notification: {
+        sound: "default",
+      },
+    },
+
+    // iOS config (APNs)
+    apns: {
+      payload: {
+        aps: {
+          sound: "default",
+        },
+      },
+    },
+
     data,
   };
 

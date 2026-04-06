@@ -14,9 +14,12 @@ const logger = new Logger("socketPresence");
  */
 export async function sendPresenceList(socket, userId) {
   try {
-    // Get user's conversations
+    const companyId = socket.user?.companyId;
+
+    // Get user's conversations (only in their company)
     const userConversations = await Conversation.find({
       members: userId,
+      companyId,
     })
       .select("members")
       .lean();
@@ -32,13 +35,24 @@ export async function sendPresenceList(socket, userId) {
       });
     });
 
-    // Get presence only for relevant users
+    // Get presence only for relevant users in the same company
     const presenceList = await Promise.all(
       Array.from(relevantUserIds).map(async (id) => {
         try {
-          const presence = await getUserPresenceService(id);
-          const isOnline =
-            presenceManager.isUserOnline(id) || presence?.online === true;
+          const presence = await getUserPresenceService(id, companyId);
+          const sockets = presenceManager.getUserSockets(id);
+          let hasActiveSocket = false;
+
+          for (const socketId of sockets) {
+            if (socket.nsp.sockets.has(socketId)) {
+              hasActiveSocket = true;
+              break;
+            } else {
+              presenceManager.removeConnection(id, socketId);
+            }
+          }
+
+          const isOnline = hasActiveSocket || presence?.online === true;
 
           return {
             userId: id,
@@ -53,13 +67,13 @@ export async function sendPresenceList(socket, userId) {
             lastSeen: null,
           };
         }
-      })
+      }),
     );
 
     socket.emit(SOCKET_EVENTS.PRESENCE_LIST, presenceList);
 
     logger.info(
-      `Sent presence list with ${presenceList.length} users to ${userId}`
+      `Sent presence list with ${presenceList.length} users to ${userId} in company ${companyId}`,
     );
   } catch (error) {
     logger.error("Failed to send presence list:", error);

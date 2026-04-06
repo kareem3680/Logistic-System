@@ -1,5 +1,5 @@
 import { Router } from "express";
-const router = Router();
+const router = Router({ mergeParams: true });
 
 import {
   addComment,
@@ -17,37 +17,36 @@ import {
   protect,
   allowedTo,
 } from "../../identity/controllers/authController.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
 
-router.post(
-  "/:loadId",
-  protect,
-  allowedTo("admin", "employee", "driver"),
-  addCommentValidator,
-  addComment
-);
+// Protect all routes
+router.use(protect);
+router.use(setCompany);
 
-router.patch(
-  "/:loadId/:commentId",
-  protect,
-  allowedTo("admin", "employee"),
-  updateCommentValidator,
-  updateComment
-);
+router
+  .route("/:loadId")
+  .post(
+    allowedTo("admin", "employee", "driver"),
+    addCommentValidator,
+    addComment,
+  )
+  .get(
+    allowedTo("admin", "employee", "driver"),
+    getCommentsValidator,
+    getComments,
+  );
 
-router.delete(
-  "/:loadId/:commentId",
-  protect,
-  allowedTo("admin", "employee"),
-  deleteCommentValidator,
-  deleteComment
-);
-
-router.get(
-  "/:loadId",
-  protect,
-  allowedTo("admin", "employee"),
-  getCommentsValidator,
-  getComments
-);
+router
+  .route("/:loadId/:commentId")
+  .patch(
+    allowedTo("admin", "employee", "driver"),
+    updateCommentValidator,
+    updateComment,
+  )
+  .delete(
+    allowedTo("admin", "employee", "driver"),
+    deleteCommentValidator,
+    deleteComment,
+  );
 
 export default router;

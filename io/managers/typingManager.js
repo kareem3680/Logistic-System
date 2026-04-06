@@ -39,7 +39,7 @@ class TypingManager {
       }
 
       logger.info(
-        `⏱Auto-stopped typing for user ${userId} in conversation ${conversationId}`
+        `Auto-stopped typing for user ${userId} in conversation ${conversationId}`
       );
     }, this.timeoutMs);
 

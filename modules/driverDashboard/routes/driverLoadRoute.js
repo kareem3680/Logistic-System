@@ -2,10 +2,15 @@ import { Router } from "express";
 const router = Router();
 
 import { uploadPDFs } from "../../../middlewares/uploadMiddleware.js";
-import { addDriverDocumentsValidator } from "../validators/driverLoadValidator.js";
+import { setCompany } from "../../../middlewares/companyMiddleware.js";
+import {
+  addDriverDocumentsValidator,
+  updateLoadAppointmentValidator,
+} from "../validators/driverLoadValidator.js";
 import {
   getAllLoads,
   addDriverDocuments,
+  updateLoadAppointment,
 } from "../controllers/driverLoadController.js";
 
 import {
@@ -13,15 +18,26 @@ import {
   allowedTo,
 } from "../../identity/controllers/authController.js";
 
-router.route("/").get(protect, allowedTo("driver"), getAllLoads);
+// Protect all routes
+router.use(protect);
+router.use(setCompany);
+
+router.route("/").get(allowedTo("driver"), getAllLoads);
 
 router.post(
   "/add-documents/:id",
-  protect,
   allowedTo("driver"),
   uploadPDFs,
   addDriverDocumentsValidator,
-  addDriverDocuments
+  addDriverDocuments,
 );
+
+router
+  .route("/update-appointment/:id")
+  .patch(
+    allowedTo("driver"),
+    updateLoadAppointmentValidator,
+    updateLoadAppointment,
+  );
 
 export default router;

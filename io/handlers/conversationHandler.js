@@ -4,11 +4,11 @@ import {
   validateConversationMembership,
 } from "../utils/validation.js";
 import { emitSocketError } from "../utils/errorEmitter.js";
-import Logger from "../../utils/loggerService.js";
 import {
   getConversationRoom,
   leaveAllConversationRooms,
 } from "../utils/roomHelper.js";
+import Logger from "../../utils/loggerService.js";
 
 const logger = new Logger("socketConversation");
 
@@ -19,6 +19,8 @@ const logger = new Logger("socketConversation");
  */
 export function handleJoinConversation(socket, userId) {
   socket.on(SOCKET_EVENTS.JOIN_CONVERSATION, async ({ conversationId }) => {
+    const companyId = socket.user?.companyId;
+
     // Validate conversation ID
     if (!isValidObjectId(conversationId)) {
       return emitSocketError(socket, {
@@ -27,8 +29,13 @@ export function handleJoinConversation(socket, userId) {
       });
     }
 
-    // Validate membership
-    const result = await validateConversationMembership(conversationId, userId);
+    // Validate membership with company isolation
+    const result = await validateConversationMembership(
+      conversationId,
+      userId,
+      companyId, // Pass companyId
+    );
+
     if (!result.valid) {
       return emitSocketError(socket, {
         message: result.message,
@@ -43,7 +50,9 @@ export function handleJoinConversation(socket, userId) {
 
     // Join new room
     socket.join(roomName);
-    logger.info(`User ${userId} joined conversation room: ${roomName}`);
+    logger.info(
+      `User ${userId} joined conversation room: ${roomName} (Company: ${companyId})`,
+    );
 
     // Acknowledge join
     socket.emit(SOCKET_EVENTS.CONVERSATION_JOINED, {

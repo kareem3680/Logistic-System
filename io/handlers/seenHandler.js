@@ -20,6 +20,8 @@ export function handleMarkSeen(socket, userId) {
   socket.on(
     SOCKET_EVENTS.MARK_SEEN,
     async ({ conversationId, messageId }, callback) => {
+      const companyId = socket.user?.companyId;
+
       // Validate conversation ID
       if (!isValidObjectId(conversationId)) {
         emitSocketError(socket, {
@@ -41,7 +43,8 @@ export function handleMarkSeen(socket, userId) {
       // Validate conversation membership
       const result = await validateConversationMembership(
         conversationId,
-        userId
+        userId,
+        companyId,
       );
       if (!result.valid) {
         emitSocketError(socket, {
@@ -57,7 +60,9 @@ export function handleMarkSeen(socket, userId) {
           const seenResult = await markMessagesSeenService(
             conversationId,
             userId,
-            messageId
+            messageId,
+            companyId,
+            socket.user?.role,
           );
 
           const roomName = getConversationRoom(conversationId);
@@ -93,8 +98,8 @@ export function handleMarkSeen(socket, userId) {
           createSocketError(
             ERROR_MESSAGES.FAILED_TO_MARK_SEEN,
             HTTP_STATUS.INTERNAL_ERROR,
-            error
-          )
+            error,
+          ),
         );
 
         if (typeof callback === "function") {
@@ -104,6 +109,6 @@ export function handleMarkSeen(socket, userId) {
           });
         }
       }
-    }
+    },
   );
 }
